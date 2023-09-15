@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/fullstack
+    username: root
+    password: my0504
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+
+# ?? ? ?? ??? ?? ?? ???? gzip?? ??
+server:
+  compression:
+    enabled: true
+    mime-types: text/html,text/plain,text/css,application/javascript,application/json, application/zip, application/octet-stream, image/jpeg, image/png
+    min-response-size: 500
+
+jwt :
+  secret : "4D4Z1TZIhrndkU78jzufWz6htOc5hDPqsleclrleltltlolkleln"
