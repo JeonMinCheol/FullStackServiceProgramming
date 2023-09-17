@@ -1,10 +1,7 @@
 package fullstack.spring.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,24 +13,27 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
+@Builder
+@NoArgsConstructor
 @AllArgsConstructor
 public class User extends BaseTime implements UserDetails {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Column(unique = true)
-    private String email;
+    private String email = null;
 
-    private String password;
+    private String password = null;
 
-    private String name;
+    private String name = null;
 
     @Column(unique = true)
-    private String nickName;
+    private String nickName = null;
 
     @Enumerated(value = EnumType.STRING)
-    private Role role;
+    private Role role = null;
 
     @OneToMany(mappedBy = "user", targetEntity = Friend.class) // 양방향 조회 설정
     private List<Friend> friends = new ArrayList<>();
