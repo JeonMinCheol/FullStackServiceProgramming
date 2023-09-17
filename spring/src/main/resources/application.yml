@@ -1,4 +1,7 @@
 spring:
+  devtools:
+    livereload:
+      enabled: true
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/fullstack
@@ -21,4 +24,4 @@ server:
     min-response-size: 500
 
 jwt :
-  secret : "4D4Z1TZIhrndkU78jzufWz6htOc5hDPqsleclrleltltlolkleln"
+  secret : "4D4Z1TZIhrndkU78jzufWz6htOc5hDPqsleclrleltltlolklelnzmdialiesdosdimzx"
