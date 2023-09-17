@@ -3,8 +3,8 @@ package fullstack.spring.security.dto;
 import lombok.*;
 
 @Data
-@Builder
+@NoArgsConstructor
 public class LoginDto {
-    private final String email;
-    private final String password;
+    private String email;
+    private String password;
 }

@@ -1,27 +1,45 @@
 package fullstack.spring.security.controller;
 
+import fullstack.spring.entity.User;
+import fullstack.spring.security.dto.LoginDto;
 import fullstack.spring.security.service.AuthenticationService;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
-@RestController("/api/auth")
+import java.sql.SQLException;
+
+@Slf4j
+@EnableWebMvc
+@RestController
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestPart String request, @RequestPart(required = false) MultipartFile Avatar) {
-        return null;
+    public ResponseEntity<?> register(@RequestBody User request, @RequestPart(required = false) MultipartFile Avatar) {
+        try{
+            return authenticationService.register(request, Avatar);
+        }
+        catch (SQLException e) {
+            return new ResponseEntity<String>(e.getMessage(),HttpStatusCode.valueOf(403));
+        }
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody String request) {
-        return null;
+    public ResponseEntity<?> login(@RequestBody LoginDto request) {
+        try{
+            return authenticationService.login(request);
+        } catch(Exception e) {
+            return new ResponseEntity<String>(e.getMessage(), HttpStatusCode.valueOf(403));
+        }
     }
-
 }
