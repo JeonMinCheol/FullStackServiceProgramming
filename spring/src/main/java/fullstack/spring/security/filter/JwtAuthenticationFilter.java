@@ -10,8 +10,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -54,7 +52,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         jwt = jwtService.extractToken(authorization);
 
         if(jwt.isPresent()){
-            Optional<User> user = userRepo.findByEmail(jwtService.extractEmail(jwt.get()));
+            Optional<User> user = userRepo.findByEmail(jwtService.tokenToEmail(jwt.get()));
 
             // 인증되지 않은 경우에 인증 처리 (ContextHolder -> Context -> Authentication(userNamePasswordToken 등록))
             if (user.isPresent() && SecurityContextHolder.getContext().getAuthentication() == null) {

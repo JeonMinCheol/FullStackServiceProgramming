@@ -4,6 +4,7 @@ import fullstack.spring.entity.Role;
 import fullstack.spring.entity.User;
 import fullstack.spring.repository.UserRepo;
 import fullstack.spring.security.dto.LoginDto;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,5 +1,6 @@
 package fullstack.spring.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -35,9 +36,11 @@ public class User extends BaseTime implements UserDetails {
     @Enumerated(value = EnumType.STRING)
     private Role role = null;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user") // 양방향 조회 설정
-    private List<UserFriend> userFriends;
+    private List<Friend> friends;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user")
     private List<UserRoom> userRooms;
 
