@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -14,6 +17,6 @@ public class Room extends BaseTime{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @ManyToOne
-    private User user;
+    @OneToMany(mappedBy = "room")
+    private List<UserRoom> rooms = new ArrayList<>();
 }

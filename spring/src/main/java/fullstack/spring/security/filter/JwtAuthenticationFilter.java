@@ -37,7 +37,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final Optional<String> jwt;
 
         // 로그인, 회원 가입은 토큰 확인 무시
-        if(request.getRequestURI().endsWith("/login") || request.getRequestURI().endsWith("/register")) {
+        if(request.getRequestURI().endsWith("/login") || request.getRequestURI().endsWith("/register") || request.getRequestURI().endsWith("/users")) {
             doFilter(request,response,filterChain);
 
             // 필터 거쳐서 서블릿 같다가 지금 여기로 돌아옴.

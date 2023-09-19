@@ -42,4 +42,13 @@ public class AuthenticationController {
             return new ResponseEntity<String>(e.getMessage(), HttpStatusCode.valueOf(403));
         }
     }
+
+    @GetMapping("/users")
+    public ResponseEntity<?> getUser() {
+        try{
+            return authenticationService.getUsers();
+        } catch (Exception e) {
+            return new ResponseEntity<String>("error", HttpStatusCode.valueOf(403));
+        }
+    }
 }

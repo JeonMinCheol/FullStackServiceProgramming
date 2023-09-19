@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity(name = "friend")
 @Getter
 @Setter
@@ -14,6 +16,6 @@ public class Friend extends BaseTime{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    private User user; // user_id
+    @OneToMany(mappedBy = "friend")
+    private List<UserFriend> friends; // user_id
 }

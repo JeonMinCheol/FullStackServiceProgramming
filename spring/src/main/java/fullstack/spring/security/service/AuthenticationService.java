@@ -71,4 +71,9 @@ public class AuthenticationService {
 
         return ResponseEntity.ok(jwtService.generateToken(email));
     }
+
+    public ResponseEntity<?> getUsers() {
+        log.info(userRepo.findAll().toString());
+        return ResponseEntity.ok(userRepo.findAll());
+    }
 }

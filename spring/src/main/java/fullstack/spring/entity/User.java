@@ -35,11 +35,11 @@ public class User extends BaseTime implements UserDetails {
     @Enumerated(value = EnumType.STRING)
     private Role role = null;
 
-    @OneToMany(mappedBy = "user", targetEntity = Friend.class) // 양방향 조회 설정
-    private List<Friend> friends = new ArrayList<>();
+    @OneToMany(mappedBy = "user") // 양방향 조회 설정
+    private List<UserFriend> userFriends;
 
-    @OneToMany(mappedBy = "user", targetEntity = Room.class) // 양방향 조회 설정
-    private List<Friend> rooms = new ArrayList<>();
+    @OneToMany(mappedBy = "user")
+    private List<UserRoom> userRooms;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
