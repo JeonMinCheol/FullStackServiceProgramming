@@ -19,7 +19,7 @@ import java.sql.SQLException;
 @Slf4j
 @EnableWebMvc
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping(value = "/api/auth", produces = "application/json; charset=utf8")
 @RequiredArgsConstructor
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
