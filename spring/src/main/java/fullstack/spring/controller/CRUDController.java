@@ -7,10 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
-import java.security.Principal;
 
 @Slf4j
 @RestController
@@ -20,6 +17,15 @@ public class CRUDController {
     private UserService userService;
 
     private JwtService jwtService;
+
+    @GetMapping("/user")
+    public ResponseEntity<?> findUser(HttpServletRequest httpServletRequest, @PathVariable String nickName) {
+        try {
+            return userService.findUser(httpServletRequest, nickName);
+        } catch (Exception e) {
+            return ResponseEntity.ok("실패");
+        }
+    }
 
     @GetMapping("/friend")
     public ResponseEntity<?> getFriendList(HttpServletRequest httpServletRequest) {
@@ -31,11 +37,13 @@ public class CRUDController {
     }
 
     @PostMapping("friend/{friendName}")
-    public ResponseEntity<?> makeFriendRelationship (HttpServletRequest httpServletRequest, @PathVariable String friendName) {
+    public ResponseEntity<?> addFriend(HttpServletRequest httpServletRequest, @PathVariable String friendName) {
         try {
-            return userService.makeFriendRelationship(httpServletRequest, friendName);
+            return userService.addFriend(httpServletRequest, friendName);
         } catch (Exception e) {
             return new ResponseEntity<String>(e.getMessage(), HttpStatusCode.valueOf(403));
         }
     }
+
+
 }
