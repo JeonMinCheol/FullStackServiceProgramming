@@ -1,5 +1,6 @@
 package fullstack.spring.service;
 
+import fullstack.spring.dto.UserDTO;
 import fullstack.spring.entity.Friend;
 import fullstack.spring.entity.User;
 import fullstack.spring.repository.FriendRepo;
@@ -70,10 +71,10 @@ public class UserService {
     public ResponseEntity<?> findUser(HttpServletRequest httpServletRequest, String nickName) throws Exception {
         try{
             long id = jwtService.extractIdFromHeader(httpServletRequest);
+            User user = userRepo.findByNickName(nickName).get();
+            UserDTO userDTO = new UserDTO(user.getId(), user.getEmail(), user.getName(), user.getNickName(), user.getRole());
 
-            User response ;
-
-            return new ResponseEntity<>(userRepo.findByNickName(nickName).get(), HttpStatus.ACCEPTED);
+            return new ResponseEntity<>(userDTO, HttpStatus.ACCEPTED);
         } catch (Exception e) {
             throw new Exception(e);
         }

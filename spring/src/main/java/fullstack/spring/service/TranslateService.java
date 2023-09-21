@@ -11,7 +11,6 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URLEncoder;
-import java.net.http.HttpClient;
 import java.util.HashMap;
 
 @Slf4j
@@ -29,6 +28,18 @@ public class TranslateService {
     @Value("${papago.client.secret}")
     private String clientSecret;
 
+    private static void createResult(HashMap<String, Object> result, ResponseEntity<?> resultMap) {
+        result.put("statusCode", resultMap.getStatusCodeValue()); //http status code를 확인
+        result.put("header", resultMap.getHeaders()); //헤더 정보 확인
+        result.put("body", resultMap.getBody()); //실제 데이터 정보 확인
+    }
+
+    private void addHeader(HttpHeaders header) {
+        header.add("X-Naver-Client-Id", clientId);
+        header.add("X-Naver-Client-Secret", clientSecret);
+        header.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
+    }
+
     public String detect(String text) throws JsonProcessingException {
         //Spring restTemplate
         HashMap<String, Object> result = new HashMap<String, Object>();
@@ -37,18 +48,14 @@ public class TranslateService {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders header = new HttpHeaders();
-        header.add("X-Naver-Client-Id", clientId);
-        header.add("X-Naver-Client-Secret", clientSecret);
-        header.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
+        addHeader(header);
 
         HttpEntity<?> entity = new HttpEntity<>("query=" + URLEncoder.encode(text), header);
 
         UriComponents uri = UriComponentsBuilder.fromHttpUrl(detectUrl).build();
 
         ResponseEntity<?> resultMap = restTemplate.exchange(uri.toString(), HttpMethod.POST, entity, Object.class);
-        result.put("statusCode", resultMap.getStatusCodeValue()); //http status code를 확인
-        result.put("header", resultMap.getHeaders()); //헤더 정보 확인
-        result.put("body", resultMap.getBody()); //실제 데이터 정보 확인
+        createResult(result, resultMap);
 
         //데이터를 제대로 전달 받았는지 확인 string형태로 파싱해줌
         ObjectMapper mapper = new ObjectMapper();
@@ -65,9 +72,7 @@ public class TranslateService {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders header = new HttpHeaders();
-        header.add("X-Naver-Client-Id", clientId);
-        header.add("X-Naver-Client-Secret", clientSecret);
-        header.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
+        addHeader(header);
 
         String data = "source=" + source + "&target=ko&text=" + text;
         log.info(data);
@@ -77,14 +82,11 @@ public class TranslateService {
         UriComponents uri = UriComponentsBuilder.fromHttpUrl(translateUrl).build();
 
         ResponseEntity<?> resultMap = restTemplate.exchange(uri.toString(), HttpMethod.POST, entity, Object.class);
-        result.put("statusCode", resultMap.getStatusCodeValue()); //http status code를 확인
-        result.put("header", resultMap.getHeaders()); //헤더 정보 확인
-        result.put("body", resultMap.getBody()); //실제 데이터 정보 확인
+        createResult(result, resultMap);
 
         //데이터를 제대로 전달 받았는지 확인 string형태로 파싱해줌
         ObjectMapper mapper = new ObjectMapper();
         jsonInString = mapper.writeValueAsString(resultMap.getBody());
-        log.info("result : " + jsonInString);
         return jsonInString;
     }
 
