@@ -18,7 +18,7 @@ public class CRUDController {
 
     private JwtService jwtService;
 
-    @GetMapping("/user")
+    @GetMapping("/user/{nickName}")
     public ResponseEntity<?> findUser(HttpServletRequest httpServletRequest, @PathVariable String nickName) {
         try {
             return userService.findUser(httpServletRequest, nickName);
