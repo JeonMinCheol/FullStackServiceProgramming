@@ -23,13 +23,7 @@ server:
     mime-types: text/html,text/plain,text/css,application/javascript,application/json, application/zip, application/octet-stream, image/jpeg, image/png
     min-response-size: 500
 
-jwt :
-  secret : "4D4Z1TZIhrndkU78jzufWz6htOc5hDPqsleclrleltltlolklelnzmdialiesdosdimzx"
-
 papago:
   url:
     detect: "https://openapi.naver.com/v1/papago/detectLangs"
     translate: "https://openapi.naver.com/v1/papago/n2mt"
-  client:
-      id: "leyIGMTa27uzMDjg9iIv"
-      secret:
