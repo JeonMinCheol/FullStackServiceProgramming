@@ -1,13 +1,13 @@
 package fullstack.spring.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
 @AllArgsConstructor
 public class Comment extends BaseTime{
     @Id
@@ -20,5 +20,7 @@ public class Comment extends BaseTime{
     @ManyToOne
     private Room room;
 
-    private String Content;
+    private String text;
+
+    private String translate;
 }
