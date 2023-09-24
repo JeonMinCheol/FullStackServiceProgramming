@@ -1,5 +1,6 @@
 package fullstack.spring.service;
 
+import fullstack.spring.dto.FriendDTO;
 import fullstack.spring.dto.UserDTO;
 import fullstack.spring.entity.Friend;
 import fullstack.spring.entity.User;
@@ -9,6 +10,7 @@ import fullstack.spring.security.service.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -23,11 +25,14 @@ import java.util.Objects;
 @Service
 @AllArgsConstructor
 public class UserService {
+    @Autowired
     private UserRepo userRepo;
+    @Autowired
     private FriendRepo friendRepo;
+    @Autowired
     private JwtService jwtService;
 
-    public ResponseEntity<?> addFriend(HttpServletRequest httpServletRequest, String targetName) {
+    public void addFriend(HttpServletRequest httpServletRequest, String targetName) throws Exception {
         try{
             String userEmail = jwtService.extractEmailFromHeader(httpServletRequest);
 
@@ -39,20 +44,27 @@ public class UserService {
                     .user(user1)
                     .email(user2.getEmail())
                     .nickName(user2.getNickName())
-                    .friendId(user2.getId())
+                    .targetId(user2.getId())
                     .build();
 
+            Friend friend2 = Friend
+                    .builder()
+                    .user(user2)
+                    .email(user1.getEmail())
+                    .nickName(user1.getNickName())
+                    .targetId(user1.getId())
+                    .build();
 
             for (Friend friend1 : friendRepo.findAllByUserId(user1.getId()).get()) {
                 if(Objects.equals(friend.getEmail(), friend1.getEmail())) {
-                    return new ResponseEntity<>("already have.", HttpStatusCode.valueOf(403));
+                    throw new Exception("이미 등록된 친구입니다.");
                 }
             }
 
             friendRepo.save(friend);
-            return new ResponseEntity<String>("친구 추가가 완료되었습니다.", HttpStatus.CREATED);
+            friendRepo.save(friend2);
         } catch (Exception e) {
-            return new ResponseEntity<String>(e.getMessage(), HttpStatusCode.valueOf(403));
+            throw new Exception(e);
         }
     }
 
@@ -60,9 +72,20 @@ public class UserService {
         try{
             long id = jwtService.extractIdFromHeader(httpServletRequest);
 
-            List<Friend> response = new ArrayList<>();
+            List<FriendDTO> response = new ArrayList<>();
 
-            return new ResponseEntity<>(friendRepo.findAllByUserId(id).get(), HttpStatus.ACCEPTED);
+            friendRepo.findAllByUserId(id).get().forEach(friend -> {
+                response.add(FriendDTO
+                        .builder()
+                        .id(friend.getId())
+                        .nickName(friend.getNickName())
+                        .email(friend.getEmail())
+                        .targetId(friend.getTargetId())
+                        .build()
+                );
+            });
+
+            return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
         } catch (Exception e) {
             throw new Exception(e);
         }

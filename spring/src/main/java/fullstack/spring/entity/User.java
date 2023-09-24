@@ -24,17 +24,20 @@ public class User extends BaseTime implements UserDetails {
     private long id;
 
     @Column(unique = true)
-    private String email = null;
+    private String email;
 
-    private String password = null;
+    private String password;
 
-    private String name = null;
+    private String name;
 
     @Column(unique = true)
-    private String nickName = null;
+    private String nickName;
 
     @Enumerated(value = EnumType.STRING)
-    private Role role = null;
+    private Role role;
+
+    @OneToOne(mappedBy = "user")
+    private Profile profile;
 
     @JsonIgnore
     @OneToMany(mappedBy = "user") // 양방향 조회 설정
@@ -42,7 +45,10 @@ public class User extends BaseTime implements UserDetails {
 
     @JsonIgnore
     @OneToMany(mappedBy = "user")
-    private List<UserRoom> userRooms;
+    private List<Room> rooms;
+
+    @OneToMany(mappedBy = "user")
+    private List<Comment> comments;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
