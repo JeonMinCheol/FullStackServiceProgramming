@@ -1,7 +1,9 @@
 package fullstack.spring.security.service;
 
+import fullstack.spring.entity.Profile;
 import fullstack.spring.entity.Role;
 import fullstack.spring.entity.User;
+import fullstack.spring.repository.ProfileRepo;
 import fullstack.spring.repository.UserRepo;
 import fullstack.spring.security.dto.LoginDto;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,17 +31,25 @@ public class AuthenticationService {
     private final UserRepo userRepo;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final ProfileRepo profileRepo;
+    private final MediaService mediaService;
 
     // 1. 회원 가입
     // 이메일과 닉네임 중복 확인
     // 중복 시 에러
 
-    public ResponseEntity<?> register(User request, MultipartFile Avatar) throws SQLException {
+    public ResponseEntity<?> register(User request, MultipartFile Avatar) throws Exception {
+
+        log.info(String.valueOf(request.getId()));
+        log.info(String.valueOf(request.getNickName()));
+        log.info(String.valueOf(request.getEmail()));
 
         if(userRepo.findByEmail(request.getEmail()).isPresent())
             throw new SQLException("이미 등록된 이메일입니다");
-        else if(userRepo.findByNickName(request.getNickName()).isPresent())
+        else if(userRepo.findByNickName(request.getNickName()).isPresent()){
+
             throw new SQLException("이미 등록된 이름입니다.");
+        }
 
 
         User user = User
@@ -53,6 +63,15 @@ public class AuthenticationService {
 
         userRepo.save(user);
 
+        if(!Avatar.isEmpty()) {
+            Profile profile = Profile
+                    .builder()
+                    .path(mediaService.uploadProfileImg(Avatar))
+                    .user(user)
+                    .build();
+
+            profileRepo.save(profile);
+        }
         return new ResponseEntity<String>("Register has been successfully finished.", HttpStatus.CREATED);
     }
 

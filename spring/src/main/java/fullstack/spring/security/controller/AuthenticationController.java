@@ -25,11 +25,11 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody User request, @RequestPart(required = false) MultipartFile Avatar) {
+    public ResponseEntity<?> register(@RequestPart User request, @RequestPart(required = false) MultipartFile Profile) {
         try{
-            return authenticationService.register(request, Avatar);
+            return authenticationService.register(request, Profile);
         }
-        catch (SQLException e) {
+        catch (Exception e) {
             return new ResponseEntity<String>(e.getMessage(),HttpStatusCode.valueOf(403));
         }
     }
