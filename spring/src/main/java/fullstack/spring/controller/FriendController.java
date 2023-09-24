@@ -1,6 +1,8 @@
 package fullstack.spring.controller;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import fullstack.spring.security.service.JwtService;
+import fullstack.spring.service.RoomService;
 import fullstack.spring.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -11,35 +13,32 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/api")
-public class CRUDController {
+@RequestMapping(value = "/api" , produces = "application/json; charset=utf8")
+public class FriendController {
     @Autowired
     private UserService userService;
 
+    @Autowired
     private JwtService jwtService;
 
-    @GetMapping("/user/{nickName}")
-    public ResponseEntity<?> findUser(HttpServletRequest httpServletRequest, @PathVariable String nickName) {
-        try {
-            return userService.findUser(httpServletRequest, nickName);
-        } catch (Exception e) {
-            return ResponseEntity.ok("실패");
-        }
-    }
+    @Autowired
+    private RoomService roomService;
 
     @GetMapping("/friend")
     public ResponseEntity<?> getFriendList(HttpServletRequest httpServletRequest) {
         try {
             return userService.getFriends(httpServletRequest);
         } catch (Exception e) {
-            return ResponseEntity.ok("실패");
+            return ResponseEntity.ok(e.getMessage());
         }
     }
 
     @PostMapping("friend/{friendName}")
     public ResponseEntity<?> addFriend(HttpServletRequest httpServletRequest, @PathVariable String friendName) {
         try {
-            return userService.addFriend(httpServletRequest, friendName);
+            userService.addFriend(httpServletRequest, friendName);
+
+            return roomService.createRoom(httpServletRequest, friendName);
         } catch (Exception e) {
             return new ResponseEntity<String>(e.getMessage(), HttpStatusCode.valueOf(403));
         }
