@@ -3,6 +3,9 @@ package fullstack.spring.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -28,6 +31,8 @@ public class TranslateService {
     @Value("${papago.client.secret}")
     private String clientSecret;
 
+    private JSONParser parser = new JSONParser();
+
     private static void createResult(HashMap<String, Object> result, ResponseEntity<?> resultMap) {
         result.put("statusCode", resultMap.getStatusCodeValue()); //http status code를 확인
         result.put("header", resultMap.getHeaders()); //헤더 정보 확인
@@ -40,8 +45,7 @@ public class TranslateService {
         header.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
     }
 
-    public String detect(String text) throws JsonProcessingException {
-        //Spring restTemplate
+    public String detect(String text) throws JsonProcessingException, ParseException {
         HashMap<String, Object> result = new HashMap<String, Object>();
         String jsonInString = "";
 
@@ -61,11 +65,13 @@ public class TranslateService {
         ObjectMapper mapper = new ObjectMapper();
         jsonInString = mapper.writeValueAsString(resultMap.getBody());
 
-        return jsonInString;
+        JSONObject object = (JSONObject) parser.parse(jsonInString);
+        String langCode = (String) object.get("langCode");
+
+        return langCode;
     }
 
-    public String translate(String text, String source) throws JsonProcessingException {
-        //Spring restTemplate
+    public String translate(String text, String source) throws JsonProcessingException, ParseException {
         HashMap<String, Object> result = new HashMap<String, Object>();
         String jsonInString = "";
 
@@ -87,7 +93,13 @@ public class TranslateService {
         //데이터를 제대로 전달 받았는지 확인 string형태로 파싱해줌
         ObjectMapper mapper = new ObjectMapper();
         jsonInString = mapper.writeValueAsString(resultMap.getBody());
-        return jsonInString;
+
+        JSONObject object = (JSONObject) parser.parse(jsonInString);
+        JSONObject ret1 = (JSONObject) object.get("message");
+        JSONObject ret2 = (JSONObject) ret1.get("result");
+        String translatedText = (String) ret2.get("translatedText");
+
+        return translatedText;
     }
 
 }
