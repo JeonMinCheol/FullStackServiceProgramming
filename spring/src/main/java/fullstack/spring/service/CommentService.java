@@ -2,24 +2,20 @@ package fullstack.spring.service;
 
 import fullstack.spring.dto.TranslateDataDTO;
 import fullstack.spring.entity.Comment;
+import fullstack.spring.entity.ImageType;
 import fullstack.spring.entity.Room;
 import fullstack.spring.entity.User;
 import fullstack.spring.repository.CommentRepo;
 import fullstack.spring.repository.RoomRepo;
 import fullstack.spring.repository.UserRepo;
 import fullstack.spring.security.service.JwtService;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
+import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @Service
@@ -39,9 +35,12 @@ public class CommentService {
     @Autowired
     private TranslateService translateService;
 
+    @Autowired
+    private MediaService mediaService;
+
     private JSONParser parser = new JSONParser();
 
-    public void addComment(HttpServletRequest httpServletRequest, long roomId, TranslateDataDTO content) throws ServletException, IOException, ParseException {
+    public void addComment(HttpServletRequest httpServletRequest, long roomId, TranslateDataDTO content, MultipartFile image) throws Exception {
         String userEmail = jwtService.extractEmailFromHeader(httpServletRequest);
 
         User user = userRepo.findByEmail(userEmail).orElseThrow(()->new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
@@ -50,12 +49,15 @@ public class CommentService {
         String langCode = translateService.detect(content.getText());
         String translateText = translateService.translate(content.getText(), langCode);
 
+        String imageUrl = (image != null) ? mediaService.uploadImg(image, ImageType.commentImg) : null;
+
         Comment comment = Comment
                 .builder()
                 .room(room)
                 .user(user)
                 .text(content.getText())
                 .translate(translateText)
+                .imageUrl(imageUrl)
                 .build();
 
         commentRepo.save(comment);

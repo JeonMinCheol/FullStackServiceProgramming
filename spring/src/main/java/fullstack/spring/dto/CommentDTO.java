@@ -14,4 +14,5 @@ public class CommentDTO {
     private long userId;
     private String text;
     private String translate;
+    private String imageUrl;
 }

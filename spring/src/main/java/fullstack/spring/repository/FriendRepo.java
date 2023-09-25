@@ -8,7 +8,9 @@ import java.util.Optional;
 
 public interface FriendRepo extends JpaRepository<Friend, Long> {
     Optional<List<Friend>> findAllByUserId(long id);
-    Optional<Friend> findByNickName(String name);
+    Optional<Friend> findByNickNameAndUserId(String targetName, long userId);
     Optional<Friend> findByTargetId(long id);
     void deleteByUserId(long id);
+
+    Optional<List<Friend>> findAllByTargetId(long id);
 }

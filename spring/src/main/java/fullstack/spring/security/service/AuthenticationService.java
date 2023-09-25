@@ -1,5 +1,6 @@
 package fullstack.spring.security.service;
 
+import fullstack.spring.entity.ImageType;
 import fullstack.spring.entity.Profile;
 import fullstack.spring.entity.Role;
 import fullstack.spring.entity.User;
@@ -57,10 +58,10 @@ public class AuthenticationService {
 
         userRepo.save(user);
 
-        if(!Avatar.isEmpty()) {
+        if(Avatar != null) {
             Profile profile = Profile
                     .builder()
-                    .path(mediaService.uploadProfileImg(Avatar))
+                    .path(mediaService.uploadImg(Avatar, ImageType.profileImg))
                     .user(user)
                     .build();
 

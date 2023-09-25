@@ -23,4 +23,6 @@ public class Comment extends BaseTime{
     private String text;
 
     private String translate;
+
+    private String imageUrl;
 }

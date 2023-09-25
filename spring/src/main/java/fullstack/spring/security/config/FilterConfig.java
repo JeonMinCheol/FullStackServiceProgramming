@@ -32,7 +32,7 @@ import java.util.List;
 
 @Slf4j
 @Configuration
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity
 @EnableMethodSecurity
 public class FilterConfig {
     private CorsConfigurationSource corsConfigurationSource;

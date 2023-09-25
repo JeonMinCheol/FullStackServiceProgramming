@@ -27,6 +27,7 @@ public class Friend extends BaseTime {
     @ToString.Exclude
     private User user; // user와 연결할 외래키
 
-    @OneToOne(mappedBy = "friend")
-    private Room room;
+    @JsonIgnore
+    @OneToMany(mappedBy = "friend")
+    private List<Room> room;
 }

@@ -37,6 +37,7 @@ public class FriendController {
     public ResponseEntity<?> addFriend(HttpServletRequest httpServletRequest, @PathVariable String friendName) {
         try {
             userService.addFriend(httpServletRequest, friendName);
+            log.info("Friend 메서드 문제 없음");
 
             return roomService.createRoom(httpServletRequest, friendName);
         } catch (Exception e) {

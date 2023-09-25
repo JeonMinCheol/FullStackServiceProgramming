@@ -21,7 +21,7 @@ public class Room extends BaseTime{
     @ManyToOne
     private User user;
 
-    @OneToOne
+    @ManyToOne
     private Friend friend;
 
     @OneToMany(mappedBy = "room")

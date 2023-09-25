@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,9 +28,9 @@ public class CommentController {
     private JwtService jwtService;
 
     @PostMapping("/room/{roomId}/comment")
-    public ResponseEntity<?> addComment(HttpServletRequest httpServletRequest, @PathVariable long roomId, @RequestBody TranslateDataDTO comment) {
+    public ResponseEntity<?> addComment(HttpServletRequest httpServletRequest, @PathVariable long roomId, @RequestPart TranslateDataDTO comment, @RequestPart(required = false) MultipartFile image) {
         try {
-            commentService.addComment(httpServletRequest,roomId, comment);
+            commentService.addComment(httpServletRequest,roomId, comment, image);
             return ResponseEntity.ok("성공");
         } catch (Exception e) {
             return ResponseEntity.ok(e.getMessage());
@@ -49,6 +50,7 @@ public class CommentController {
                         .userId(comment.getUser().getId())
                         .text(comment.getText())
                         .translate(comment.getTranslate())
+                        .imageUrl(comment.getImageUrl())
                         .build());
             });
             return ResponseEntity.ok(response);
@@ -70,6 +72,7 @@ public class CommentController {
                         .userId(comment.getUser().getId())
                         .text(comment.getText())
                         .translate(comment.getTranslate())
+                                .imageUrl(comment.getImageUrl())
                         .build());
             });
             return ResponseEntity.ok(response);

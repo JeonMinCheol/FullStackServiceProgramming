@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import java.sql.SQLException;
+import java.util.Optional;
 
 @Slf4j
 @EnableWebMvc
@@ -27,7 +28,7 @@ public class AuthenticationController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestPart User request, @RequestPart(required = false) MultipartFile profile) {
         try{
-            return authenticationService.register(request, profile);
+          return authenticationService.register(request, profile);
         }
         catch (Exception e) {
             return new ResponseEntity<String>(e.getMessage(),HttpStatusCode.valueOf(403));

@@ -10,4 +10,6 @@ public class FriendDTO {
     private String nickName;
     private String email;
     private long targetId;    // 친구의 userid
+    private String path;
 }
+

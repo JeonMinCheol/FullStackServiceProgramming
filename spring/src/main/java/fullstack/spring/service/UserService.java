@@ -3,8 +3,10 @@ package fullstack.spring.service;
 import fullstack.spring.dto.FriendDTO;
 import fullstack.spring.dto.UserDTO;
 import fullstack.spring.entity.Friend;
+import fullstack.spring.entity.Profile;
 import fullstack.spring.entity.User;
 import fullstack.spring.repository.FriendRepo;
+import fullstack.spring.repository.ProfileRepo;
 import fullstack.spring.repository.UserRepo;
 import fullstack.spring.security.service.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,9 +19,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import javax.print.attribute.standard.Media;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -31,6 +36,10 @@ public class UserService {
     private FriendRepo friendRepo;
     @Autowired
     private JwtService jwtService;
+    @Autowired
+    private MediaService mediaService;
+    @Autowired
+    private ProfileRepo profileRepo;
 
     public void addFriend(HttpServletRequest httpServletRequest, String targetName) throws Exception {
         try{
@@ -75,15 +84,22 @@ public class UserService {
             List<FriendDTO> response = new ArrayList<>();
 
             friendRepo.findAllByUserId(id).get().forEach(friend -> {
+                Optional<Profile> profile = profileRepo.findByUserId(friend.getUser().getId());
+                String path = null;
+
+                path = profile.isPresent() ? profile.get().getPath() : "/profileImg/default-profile.jpg";
+
                 response.add(FriendDTO
                         .builder()
                         .id(friend.getId())
                         .nickName(friend.getNickName())
+                        .path(path)
                         .email(friend.getEmail())
                         .targetId(friend.getTargetId())
                         .build()
                 );
             });
+
 
             return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
         } catch (Exception e) {
@@ -93,9 +109,12 @@ public class UserService {
 
     public ResponseEntity<?> findUser(HttpServletRequest httpServletRequest, String nickName) throws Exception {
         try{
-            long id = jwtService.extractIdFromHeader(httpServletRequest);
             User user = userRepo.findByNickName(nickName).get();
-            UserDTO userDTO = new UserDTO(user.getId(), user.getEmail(), user.getName(), user.getNickName(), user.getRole());
+            Optional<Profile> profile = profileRepo.findByUserId(user.getId());
+            String path = null;
+
+            path = profile.isPresent() ? profile.get().getPath() : "/profileImg/default-profile.jpg";
+            UserDTO userDTO = new UserDTO(user.getId(), user.getEmail(), user.getName(), user.getNickName(), path, user.getRole());
 
             return new ResponseEntity<>(userDTO, HttpStatus.ACCEPTED);
         } catch (Exception e) {
