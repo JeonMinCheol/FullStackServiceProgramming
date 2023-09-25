@@ -18,7 +18,7 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("/user/{nickName}")
-    public ResponseEntity<?> findUser(HttpServletRequest httpServletRequest, @PathVariable String nickName) {
+    public ResponseEntity<?> getUserInfo(HttpServletRequest httpServletRequest, @PathVariable String nickName) {
         try {
             return userService.findUser(httpServletRequest, nickName);
         } catch (Exception e) {

@@ -25,9 +25,9 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestPart User request, @RequestPart(required = false) MultipartFile Profile) {
+    public ResponseEntity<?> register(@RequestPart User request, @RequestPart(required = false) MultipartFile profile) {
         try{
-            return authenticationService.register(request, Profile);
+            return authenticationService.register(request, profile);
         }
         catch (Exception e) {
             return new ResponseEntity<String>(e.getMessage(),HttpStatusCode.valueOf(403));

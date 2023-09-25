@@ -6,22 +6,16 @@ import fullstack.spring.entity.User;
 import fullstack.spring.repository.ProfileRepo;
 import fullstack.spring.repository.UserRepo;
 import fullstack.spring.security.dto.LoginDto;
-import jakarta.servlet.http.HttpServletRequest;
-import lombok.AllArgsConstructor;
+import fullstack.spring.service.MediaService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.naming.NameNotFoundException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.sql.SQLException;
-import java.util.Base64;
 import java.util.Optional;
 
 @Slf4j
