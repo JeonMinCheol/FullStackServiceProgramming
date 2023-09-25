@@ -10,6 +10,7 @@ import fullstack.spring.repository.UserRepo;
 import fullstack.spring.security.service.JwtService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 public class RoomService {
     @Autowired
@@ -33,28 +35,40 @@ public class RoomService {
 
     public ResponseEntity<?> createRoom(HttpServletRequest httpServletRequest, String targetName) throws Exception {
         String userEmail = jwtService.extractEmailFromHeader(httpServletRequest);
+        User user = userRepo.findByEmail(userEmail).orElseThrow(()->new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
 
-        User user1 = userRepo.findByEmail(userEmail).orElseThrow(()->new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
-        Friend friend = friendRepo.findByNickName(targetName).orElseThrow(()->new UsernameNotFoundException("친구를 찾을 수 없습니다."));
+       try{
+           //TODO : 오류 발생 지점 (친구가 여러명이네 생각해보니까)
+        Friend friend = friendRepo.findByNickNameAndUserId(targetName, user.getId()).orElseThrow(()->new UsernameNotFoundException("친구를 찾을 수 없습니다."));
+        if(roomRepo.existsByUserIdAndFriendId(user.getId(), friend.getId()))
+           throw new Exception("방이 이미 존재합니다.");
 
-        if(roomRepo.existsByUserIdAndFriendId(user1.getId(), friend.getId()))
-            throw new Exception("방이 이미 존재합니다.");
+           Room room = Room
+                   .builder()
+                   .user(user)
+                   .friend(friend)
+                   .build();
 
-        Room room = Room
-                .builder()
-                .user(user1)
-                .friend(friend)
-                .build();
+           roomRepo.save(room);
 
-        roomRepo.save(room);
+           return new ResponseEntity<String>(String.valueOf(room.getId()), HttpStatusCode.valueOf(200));
+       }catch (Exception e){
+           log.info(e.getMessage());
+           return null;
+       }
 
-        return new ResponseEntity<String>(String.valueOf(room.getId()), HttpStatusCode.valueOf(200));
+
+
+
+
     }
 
     public ResponseEntity<?> getRooms(HttpServletRequest httpServletRequest) throws Exception {
         String userEmail = jwtService.extractEmailFromHeader(httpServletRequest);
         User user = userRepo.findByEmail(userEmail).orElseThrow(()->new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
-        Friend friend = friendRepo.findByTargetId(user.getId()).get();
+
+        // TODO : 여기 수정해야함 (현재 친구가 여러명이라서 적절하게 수정할 필요가 있다.)
+        List<Friend> friends = friendRepo.findAllByTargetId(user.getId()).get();
 
         List<RoomDTO> rooms = new ArrayList<>();
 
@@ -68,6 +82,7 @@ public class RoomService {
                     .build());
         });
 
+        // TODO : 여기 코드 바꿔야함 (현재 로직과 성립되지 않음)
         // 상대가 생성한 경우 찾기 위해서
         roomRepo.findAllByFriendId(friend.getId()).get().forEach(room -> {
             rooms.add(RoomDTO
