@@ -47,6 +47,7 @@ public class RoomService {
                    .builder()
                    .user(user)
                    .friend(friend)
+                   .target(friend.getTargetId())
                    .build();
 
            roomRepo.save(room);
@@ -56,19 +57,11 @@ public class RoomService {
            log.info(e.getMessage());
            return null;
        }
-
-
-
-
-
     }
 
     public ResponseEntity<?> getRooms(HttpServletRequest httpServletRequest) throws Exception {
         String userEmail = jwtService.extractEmailFromHeader(httpServletRequest);
         User user = userRepo.findByEmail(userEmail).orElseThrow(()->new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
-
-        // TODO : 여기 수정해야함 (현재 친구가 여러명이라서 적절하게 수정할 필요가 있다.)
-        List<Friend> friends = friendRepo.findAllByTargetId(user.getId()).get();
 
         List<RoomDTO> rooms = new ArrayList<>();
 
@@ -84,7 +77,7 @@ public class RoomService {
 
         // TODO : 여기 코드 바꿔야함 (현재 로직과 성립되지 않음)
         // 상대가 생성한 경우 찾기 위해서
-        roomRepo.findAllByFriendId(friend.getId()).get().forEach(room -> {
+        roomRepo.findAllByTarget(user.getId()).get().forEach(room -> {
             rooms.add(RoomDTO
                     .builder()
                     .id(room.getId())

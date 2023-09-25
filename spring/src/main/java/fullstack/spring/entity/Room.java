@@ -24,6 +24,8 @@ public class Room extends BaseTime{
     @ManyToOne
     private Friend friend;
 
+    private long target;
+
     @OneToMany(mappedBy = "room")
     private List<Comment> comments;
 }

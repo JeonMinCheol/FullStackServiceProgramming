@@ -9,7 +9,7 @@ import java.util.Optional;
 public interface RoomRepo extends JpaRepository<Room, Long> {
     boolean existsByUserIdAndFriendId(long userId, long friendId);
     Optional<Room> findByUserIdAndFriendId(long userId, long FriendId);
-
     Optional<List<Room>> findAllByUserId(long user);
     Optional<List<Room>> findAllByFriendId(long friend);
+    Optional<List<Room>> findAllByTarget(long target);
 }

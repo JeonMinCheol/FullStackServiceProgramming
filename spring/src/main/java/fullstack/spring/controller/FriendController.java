@@ -2,6 +2,7 @@ package fullstack.spring.controller;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import fullstack.spring.security.service.JwtService;
+import fullstack.spring.service.FriendService;
 import fullstack.spring.service.RoomService;
 import fullstack.spring.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(value = "/api" , produces = "application/json; charset=utf8")
 public class FriendController {
     @Autowired
-    private UserService userService;
+    private FriendService friendService;
 
     @Autowired
     private JwtService jwtService;
@@ -27,7 +28,7 @@ public class FriendController {
     @GetMapping("/friend")
     public ResponseEntity<?> getFriendList(HttpServletRequest httpServletRequest) {
         try {
-            return userService.getFriends(httpServletRequest);
+            return friendService.getFriends(httpServletRequest);
         } catch (Exception e) {
             return ResponseEntity.ok(e.getMessage());
         }
@@ -36,8 +37,7 @@ public class FriendController {
     @PostMapping("friend/{friendName}")
     public ResponseEntity<?> addFriend(HttpServletRequest httpServletRequest, @PathVariable String friendName) {
         try {
-            userService.addFriend(httpServletRequest, friendName);
-            log.info("Friend 메서드 문제 없음");
+            friendService.addFriend(httpServletRequest, friendName);
 
             return roomService.createRoom(httpServletRequest, friendName);
         } catch (Exception e) {
