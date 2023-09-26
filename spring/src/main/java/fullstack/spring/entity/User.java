@@ -30,6 +30,8 @@ public class User extends BaseTime implements UserDetails {
 
     private String name;
 
+    private Boolean status = false;
+
     @Column(unique = true)
     private String nickName;
 

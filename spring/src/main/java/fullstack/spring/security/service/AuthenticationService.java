@@ -8,6 +8,8 @@ import fullstack.spring.repository.ProfileRepo;
 import fullstack.spring.repository.UserRepo;
 import fullstack.spring.security.dto.LoginDto;
 import fullstack.spring.service.MediaService;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -16,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Optional;
 
@@ -54,6 +57,7 @@ public class AuthenticationService {
                 .nickName(request.getNickName())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.USER)
+                .status(false)
                 .build();
 
         userRepo.save(user);
@@ -74,17 +78,40 @@ public class AuthenticationService {
         String email = request.getEmail();
         String password = request.getPassword();
 
-        Optional<User> user = userRepo.findByEmail(email);
-        if(user.isPresent()) {
-            if(!passwordEncoder.matches(password, user.get().getPassword())) {
+        Optional<User> optionalUser = userRepo.findByEmail(email);
+        if(optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            if(user.getStatus())
+                throw new Exception("이미 로그인 되어있습니다.");
+
+            else if(!passwordEncoder.matches(password, user.getPassword()))
                 throw new Exception("비밀번호가 일치하지 않습니다.");
-            }
+
+            user.setStatus(true);
+            userRepo.save(user);
         }
         else {
             throw new Exception("등록되지 않은 이메일입니다.");
         }
 
         return ResponseEntity.ok(jwtService.generateToken(email));
+    }
+
+    public ResponseEntity<?> logout(HttpServletRequest httpServletRequest) throws Exception {
+        long id = jwtService.extractIdFromHeader(httpServletRequest);
+        Optional<User> optionalUser = userRepo.findById(id);
+
+        if(optionalUser.isEmpty())
+            throw new Exception("등록되지 않은 이메일입니다.");
+
+        User user = optionalUser.get();
+
+        if(!user.getStatus())
+            throw new Exception("이미 로그아웃 되어있습니다.");
+
+        user.setStatus(false);
+        userRepo.save(user);
+        return ResponseEntity.ok("로그아웃 되었습니다.");
     }
 
     public ResponseEntity<?> getUsers() {

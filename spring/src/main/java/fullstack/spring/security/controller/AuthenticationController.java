@@ -3,6 +3,7 @@ package fullstack.spring.security.controller;
 import fullstack.spring.entity.User;
 import fullstack.spring.security.dto.LoginDto;
 import fullstack.spring.security.service.AuthenticationService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +40,15 @@ public class AuthenticationController {
     public ResponseEntity<?> login(@RequestBody LoginDto request) {
         try{
             return authenticationService.login(request);
+        } catch(Exception e) {
+            return new ResponseEntity<String>(e.getMessage(), HttpStatusCode.valueOf(403));
+        }
+    }
+
+    @GetMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletRequest request) {
+        try{
+            return authenticationService.logout(request);
         } catch(Exception e) {
             return new ResponseEntity<String>(e.getMessage(), HttpStatusCode.valueOf(403));
         }
