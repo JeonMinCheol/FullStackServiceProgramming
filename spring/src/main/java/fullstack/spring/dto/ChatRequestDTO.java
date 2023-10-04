@@ -5,15 +5,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-// http 테스트 용
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CommentDTO {
-    private long id;
-    private long userId;
+public class ChatRequestDTO {
+    private String username;
+    private byte[] binaryImage;
     private String text;
-    private String translate;
-    private String imageUrl;
+    private long roomId;
 }

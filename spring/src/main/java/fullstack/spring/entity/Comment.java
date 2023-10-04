@@ -24,5 +24,6 @@ public class Comment extends BaseTime{
 
     private String translate;
 
-    private String imageUrl;
+    @Lob
+    private String image;
 }

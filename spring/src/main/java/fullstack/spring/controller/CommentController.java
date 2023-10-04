@@ -1,6 +1,5 @@
 package fullstack.spring.controller;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import fullstack.spring.dto.CommentDTO;
 import fullstack.spring.dto.TranslateDataDTO;
 import fullstack.spring.entity.Comment;
@@ -10,7 +9,6 @@ import fullstack.spring.service.CommentService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,7 +28,7 @@ public class CommentController {
     @PostMapping("/room/{roomId}/comment")
     public ResponseEntity<?> addComment(HttpServletRequest httpServletRequest, @PathVariable long roomId, @RequestPart TranslateDataDTO comment, @RequestPart(required = false) MultipartFile image) {
         try {
-            commentService.addComment(httpServletRequest,roomId, comment, image);
+            commentService.addComment_http(httpServletRequest,roomId, comment, image);
             return ResponseEntity.ok("성공");
         } catch (Exception e) {
             return ResponseEntity.ok(e.getMessage());
@@ -43,16 +41,14 @@ public class CommentController {
             List<Comment> comments = commentRepo.findAllByUserIdAndRoomId(jwtService.extractIdFromHeader(httpServletRequest), roomId).get();
             List<CommentDTO> response = new ArrayList<>();
 
-            comments.forEach(comment -> {
-                response.add(CommentDTO
-                        .builder()
-                        .id(comment.getId())
-                        .userId(comment.getUser().getId())
-                        .text(comment.getText())
-                        .translate(comment.getTranslate())
-                        .imageUrl(comment.getImageUrl())
-                        .build());
-            });
+            comments.forEach(comment -> response.add(CommentDTO
+                    .builder()
+                    .id(comment.getId())
+                    .userId(comment.getUser().getId())
+                    .text(comment.getText())
+                    .translate(comment.getTranslate())
+                    .imageUrl(comment.getImage())
+                    .build()));
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.ok(e.getMessage());
@@ -65,16 +61,14 @@ public class CommentController {
             List<Comment> comments = commentRepo.findAllByRoomId(roomId).get();
             List<CommentDTO> response = new ArrayList<>();
 
-            comments.forEach(comment -> {
-                response.add(CommentDTO
-                        .builder()
-                        .id(comment.getId())
-                        .userId(comment.getUser().getId())
-                        .text(comment.getText())
-                        .translate(comment.getTranslate())
-                                .imageUrl(comment.getImageUrl())
-                        .build());
-            });
+            comments.forEach(comment -> response.add(CommentDTO
+                    .builder()
+                    .id(comment.getId())
+                    .userId(comment.getUser().getId())
+                    .text(comment.getText())
+                    .translate(comment.getTranslate())
+                    .imageUrl(comment.getImage())
+                    .build()));
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.ok(e.getMessage());
