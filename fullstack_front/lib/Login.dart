@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:fullstack_front/Register.dart';
 import 'HexColor.dart';
@@ -8,8 +9,8 @@ class Login extends StatefulWidget {
 }
 
 class _LogInState extends State<Login> {
-  TextEditingController controller = TextEditingController();
-  TextEditingController controller2 = TextEditingController();
+  TextEditingController emailTextController = TextEditingController();
+  TextEditingController passwordTextController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -117,18 +118,7 @@ class _LogInState extends State<Login> {
         height: 50.0,
         child: ElevatedButton(
             onPressed: () {
-              if (controller.text == '1' && controller2.text == '1234') {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (BuildContext context) => NextPage()));
-              } else if (controller.text == '1' && controller2.text != '1234') {
-                showSnackBar(context, Text('Wrong password'));
-              } else if (controller.text != '1' && controller2.text == '1234') {
-                showSnackBar(context, Text('Wrong email'));
-              } else {
-                showSnackBar(context, Text('Check your info again'));
-              }
+              loginRequest();
             },
             child: Text(
               'Login',
@@ -147,7 +137,7 @@ class _LogInState extends State<Login> {
 
   TextField password() {
     return TextField(
-      controller: controller2,
+      controller: passwordTextController,
       style: TextStyle(
           color: Colors.grey[700], fontWeight: FontWeight.w600, fontSize: 14),
       decoration: InputDecoration(
@@ -168,7 +158,7 @@ class _LogInState extends State<Login> {
 
   TextField email() {
     return TextField(
-      controller: controller,
+      controller: emailTextController,
       autofocus: true,
       style: TextStyle(
           color: Colors.grey[700], fontWeight: FontWeight.w600, fontSize: 14),
@@ -186,9 +176,30 @@ class _LogInState extends State<Login> {
       keyboardType: TextInputType.emailAddress,
     );
   }
+
+  Future loginRequest() async {
+    Dio dio = Dio();
+    dio.options.baseUrl="http://localhost:8080/";
+    dio.options.contentType = "application/json";
+    dio.options.responseType = ResponseType.plain;
+    dio.options.validateStatus = (status) {
+      return status! < 500;
+    };
+
+    final response = await dio.post("/api/auth/login", data: {
+      "email" : emailTextController.text,
+      "password" : passwordTextController.text
+    });
+
+    if(response.statusCode == 200) {
+      showSnackBar(context, Text("success"));
+    }
+    else {
+      showSnackBar(context, Text(response.data));
+    }
 }
 
-void showSnackBar(BuildContext context, Text text) {
+  void showSnackBar(BuildContext context, Text text) {
   final snackBar = SnackBar(
     content: text,
     backgroundColor: HexColor("#002de3"),
@@ -197,6 +208,8 @@ void showSnackBar(BuildContext context, Text text) {
 // Find the ScaffoldMessenger in the widget tree
 // and use it to show a SnackBar.
   ScaffoldMessenger.of(context).showSnackBar(snackBar);
+}
+
 }
 
 class NextPage extends StatelessWidget {
