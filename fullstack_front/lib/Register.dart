@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -14,15 +15,16 @@ class Register extends StatefulWidget {
 }
 
 class _RegisterState extends State<Register> {
-  TextEditingController controller1 = TextEditingController(); // email
-  TextEditingController controller2 = TextEditingController(); // password
-  TextEditingController controller3 = TextEditingController(); // real name
-  TextEditingController controller4 = TextEditingController(); // profile name
+  TextEditingController emailTextController = TextEditingController(); // email
+  TextEditingController passwordTextController = TextEditingController(); // password
+  TextEditingController realNameTextController = TextEditingController(); // real name
+  TextEditingController profileNameTextController = TextEditingController(); // profile name
+  String? imagePath;
   File? _selectedImage;
 
   TextField email() {
     return TextField(
-        controller: controller1,
+        controller: emailTextController,
         style: TextStyle(
             color: Colors.grey[700], fontWeight: FontWeight.w600, fontSize: 14),
         decoration: InputDecoration(
@@ -40,7 +42,7 @@ class _RegisterState extends State<Register> {
 
   TextField password() {
     return TextField(
-        controller: controller2,
+        controller: passwordTextController,
         style: TextStyle(
             color: Colors.grey[700], fontWeight: FontWeight.w600, fontSize: 14),
         decoration: InputDecoration(
@@ -58,7 +60,7 @@ class _RegisterState extends State<Register> {
 
   TextField realName() {
     return TextField(
-        controller: controller3,
+        controller: realNameTextController,
         style: TextStyle(
             color: Colors.grey[700], fontWeight: FontWeight.w600, fontSize: 14),
         decoration: InputDecoration(
@@ -76,7 +78,7 @@ class _RegisterState extends State<Register> {
 
   TextField profileName() {
     return TextField(
-        controller: controller4,
+        controller: profileNameTextController,
         style: TextStyle(
             color: Colors.grey[700], fontWeight: FontWeight.w600, fontSize: 14),
         decoration: InputDecoration(
@@ -97,7 +99,9 @@ class _RegisterState extends State<Register> {
         minWidth: 100.0,
         height: 50.0,
         child: ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              _registerRequest();
+            },
             child: Text(
               'Register',
               style: TextStyle(
@@ -198,11 +202,53 @@ class _RegisterState extends State<Register> {
   }
 
   Future _PickerImageFromGallery() async {
-    var returnedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
+    var returnedImage = await ImagePicker().pickImage(
+        source: ImageSource.gallery,
+        maxHeight: 75,
+        maxWidth: 75,
+        imageQuality: 30
+    );
 
     if(returnedImage == null) return ;
+
+    imagePath = returnedImage!.path;
+
     setState(() {
-      _selectedImage = File(returnedImage!.path);
+      _selectedImage = File(imagePath!);
     });
+  }
+
+  Future _registerRequest() async {
+    Dio dio = Dio();
+
+    dio.options.baseUrl="http://localhost:8080/";
+    dio.options.contentType = "multipart/form-data";
+    dio.options.responseType = ResponseType.plain;
+    dio.options.validateStatus = (status) {
+      return status! < 500;
+    };
+
+    FormData _formdata;
+
+    var request = {
+      "email" : emailTextController.text,
+      "password" : passwordTextController.text,
+      "name" : realNameTextController.text,
+      "nickName" : profileNameTextController.text
+    };
+
+    _formdata = FormData.fromMap({
+      "request" : request,
+      "image" : await MultipartFile.fromFile(imagePath!)
+    });
+
+    final response = await dio.post("/api/auth/register", data: _formdata);
+
+    if(response.statusCode == 200) {
+      print("register ok");
+    }
+    else {
+      print("register not ok");
+    }
   }
 }

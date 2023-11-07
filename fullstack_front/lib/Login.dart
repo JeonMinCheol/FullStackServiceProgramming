@@ -193,6 +193,7 @@ class _LogInState extends State<Login> {
 
     if(response.statusCode == 200) {
       showSnackBar(context, Text("success"));
+      print(response.data);
     }
     else {
       showSnackBar(context, Text(response.data));

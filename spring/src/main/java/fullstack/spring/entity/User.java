@@ -3,6 +3,7 @@ package fullstack.spring.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,7 +31,8 @@ public class User extends BaseTime implements UserDetails {
 
     private String name;
 
-    private Boolean status = false;
+    @ColumnDefault("false")
+    private Boolean status;
 
     @Column(unique = true)
     private String nickName;
