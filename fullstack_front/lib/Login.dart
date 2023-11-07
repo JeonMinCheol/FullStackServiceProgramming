@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:fullstack_front/Configuration.dart';
 import 'package:fullstack_front/Register.dart';
 import 'HexColor.dart';
 
@@ -181,7 +182,7 @@ class _LogInState extends State<Login> {
 
   Future loginRequest() async {
     Dio dio = Dio();
-    dio.options.baseUrl=baseUrl;
+    dio.options.baseUrl=Configuration().baseUrl;
     dio.options.contentType = "application/json";
     dio.options.responseType = ResponseType.plain;
     dio.options.validateStatus = (status) {

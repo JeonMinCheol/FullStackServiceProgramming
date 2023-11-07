@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fullstack_front/Configuration.dart';
 import 'package:image_picker/image_picker.dart';
 import 'HexColor.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -22,7 +23,6 @@ class _RegisterState extends State<Register> {
   TextEditingController passwordTextController = TextEditingController(); // password
   TextEditingController realNameTextController = TextEditingController(); // real name
   TextEditingController profileNameTextController = TextEditingController(); // profile name
-  String baseUrl = "http://163.180.117.35:8080/";
   String? imagePath;
   File? _selectedImage;
 
@@ -210,7 +210,7 @@ class _RegisterState extends State<Register> {
         source: ImageSource.gallery,
         maxHeight: 75,
         maxWidth: 75,
-        imageQuality: 30
+        imageQuality: 100
     );
 
     if(returnedImage == null) return ;
@@ -225,7 +225,7 @@ class _RegisterState extends State<Register> {
   Future _registerRequest() async {
     Dio dio = Dio();
 
-    dio.options.baseUrl=baseUrl;
+    dio.options.baseUrl=Configuration().baseUrl;
     dio.options.responseType = ResponseType.plain;
     dio.options.validateStatus = (status) {
       return status! < 500;
@@ -234,18 +234,16 @@ class _RegisterState extends State<Register> {
     FormData _formdata;
 
     dynamic request = {
-      "email" : emailTextController.text.toString(),
-      "password" : passwordTextController.text.toString(),
-      "name" : realNameTextController.text.toString(),
-      "nickName" : profileNameTextController.text.toString()
+      "email" : emailTextController.text,
+      "password" : passwordTextController.text,
+      "name" : realNameTextController.text,
+      "nickName" : profileNameTextController.text
     };
 
     _formdata = FormData.fromMap({
-      "request": MultipartFile.fromString(jsonEncode(request),contentType: MediaType.parse("application/json")),
+      "request": MultipartFile.fromString(jsonEncode(request), contentType: MediaType.parse("application/json")),
       "profile" : MultipartFile.fromFile(imagePath!)
     });
-
-    // _formdata.files.add(MapEntry("profile", await MultipartFile.fromFile(imagePath!)));
 
     final response = await dio.post("/api/auth/register", data: _formdata);
 
