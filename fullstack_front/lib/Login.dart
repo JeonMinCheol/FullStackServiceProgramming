@@ -4,6 +4,7 @@ import 'package:fullstack_front/Register.dart';
 import 'HexColor.dart';
 
 class Login extends StatefulWidget {
+
   @override
   State<Login> createState() => _LogInState();
 }
@@ -11,6 +12,7 @@ class Login extends StatefulWidget {
 class _LogInState extends State<Login> {
   TextEditingController emailTextController = TextEditingController();
   TextEditingController passwordTextController = TextEditingController();
+  String baseUrl = "http://163.180.117.35:8080/";
 
   @override
   Widget build(BuildContext context) {
@@ -179,7 +181,7 @@ class _LogInState extends State<Login> {
 
   Future loginRequest() async {
     Dio dio = Dio();
-    dio.options.baseUrl="http://localhost:8080/";
+    dio.options.baseUrl=baseUrl;
     dio.options.contentType = "application/json";
     dio.options.responseType = ResponseType.plain;
     dio.options.validateStatus = (status) {

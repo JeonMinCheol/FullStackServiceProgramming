@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -6,8 +7,10 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'HexColor.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:http_parser/http_parser.dart';
 
 class Register extends StatefulWidget {
+
   @override
   State<StatefulWidget> createState() {
     return _RegisterState();
@@ -19,6 +22,7 @@ class _RegisterState extends State<Register> {
   TextEditingController passwordTextController = TextEditingController(); // password
   TextEditingController realNameTextController = TextEditingController(); // real name
   TextEditingController profileNameTextController = TextEditingController(); // profile name
+  String baseUrl = "http://163.180.117.35:8080/";
   String? imagePath;
   File? _selectedImage;
 
@@ -221,8 +225,7 @@ class _RegisterState extends State<Register> {
   Future _registerRequest() async {
     Dio dio = Dio();
 
-    dio.options.baseUrl="http://localhost:8080/";
-    dio.options.contentType = "multipart/form-data";
+    dio.options.baseUrl=baseUrl;
     dio.options.responseType = ResponseType.plain;
     dio.options.validateStatus = (status) {
       return status! < 500;
@@ -230,25 +233,28 @@ class _RegisterState extends State<Register> {
 
     FormData _formdata;
 
-    var request = {
-      "email" : emailTextController.text,
-      "password" : passwordTextController.text,
-      "name" : realNameTextController.text,
-      "nickName" : profileNameTextController.text
+    dynamic request = {
+      "email" : emailTextController.text.toString(),
+      "password" : passwordTextController.text.toString(),
+      "name" : realNameTextController.text.toString(),
+      "nickName" : profileNameTextController.text.toString()
     };
 
     _formdata = FormData.fromMap({
-      "request" : request,
-      "image" : await MultipartFile.fromFile(imagePath!)
+      "request": MultipartFile.fromString(jsonEncode(request),contentType: MediaType.parse("application/json")),
+      "profile" : MultipartFile.fromFile(imagePath!)
     });
+
+    // _formdata.files.add(MapEntry("profile", await MultipartFile.fromFile(imagePath!)));
 
     final response = await dio.post("/api/auth/register", data: _formdata);
 
     if(response.statusCode == 200) {
-      print("register ok");
+      print(response.data);
     }
     else {
-      print("register not ok");
+      print(response.statusCode);
+      print(response.statusMessage);
     }
   }
 }
