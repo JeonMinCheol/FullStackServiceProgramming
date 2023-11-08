@@ -22,8 +22,8 @@ import java.util.stream.Collectors;
 @Service
 public class MediaService {
     private final ProfileRepo profileRepo;
-    private final String MAIN_DIR_NAME = System.getProperty("user.dir") + "/" + "demo" + "/" + "src" + "/" + "main" + "/" + "resources";
-    private final String SUB_DIR_NAME = "/" + "static";
+    private final String MAIN_DIR_NAME = System.getProperty("user.dir") + "\\" + "demo" + "\\" + "src" + "\\" + "main" + "\\" + "resources";
+    private final String SUB_DIR_NAME = "\\" + "static";
 
     enum MediaType{
         IMAGE, RAW;
@@ -58,8 +58,9 @@ public class MediaService {
             } else {
                 throw new Exception();
             }
-            String mediaURL = "/" + path + "/" + generateFileName;
+            String mediaURL = "\\" + path + "\\" + generateFileName;
             String destinationPath = MAIN_DIR_NAME +  SUB_DIR_NAME + mediaURL;
+            log.info(destinationPath);
             File destination = new File(destinationPath);
             media.transferTo(destination);
             return mediaURL;

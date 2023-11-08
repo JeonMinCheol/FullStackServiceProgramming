@@ -36,11 +36,11 @@ public class AuthenticationService {
     // 이메일과 닉네임 중복 확인
     // 중복 시 에러
 
-    public ResponseEntity<?> register(User request, MultipartFile Avatar) throws Exception {
-
-        log.info(String.valueOf(request.getId()));
-        log.info(String.valueOf(request.getNickName()));
-        log.info(String.valueOf(request.getEmail()));
+    public ResponseEntity<?> register(User request, MultipartFile image) throws Exception {
+//
+//        log.info(String.valueOf(request.getId()));
+//        log.info(String.valueOf(request.getNickName()));
+//        log.info(String.valueOf(request.getEmail()));
 
         if(userRepo.findByEmail(request.getEmail()).isPresent())
             throw new SQLException("이미 등록된 이메일입니다");
@@ -62,14 +62,15 @@ public class AuthenticationService {
 
         userRepo.save(user);
 
-        if(Avatar != null) {
+        if(image != null) {
             Profile profile = Profile
                     .builder()
-                    .path(mediaService.uploadImg(Avatar, ImageType.profileImg))
+                    .path(mediaService.uploadImg(image, ImageType.profileImg))
                     .user(user)
                     .build();
 
             profileRepo.save(profile);
+            log.info("profile 생성");
         }
         return new ResponseEntity<String>("Register has been successfully finished.", HttpStatus.CREATED);
     }
@@ -82,16 +83,16 @@ public class AuthenticationService {
         if(optionalUser.isPresent()) {
             User user = optionalUser.get();
             if(user.getStatus())
-                throw new Exception("이미 로그인 되어있습니다.");
+                throw new Exception("[Error]: User was already logined.");
 
             else if(!passwordEncoder.matches(password, user.getPassword()))
-                throw new Exception("비밀번호가 일치하지 않습니다.");
+                throw new Exception("[Error]:Password was not matched.");
 
             user.setStatus(true);
             userRepo.save(user);
         }
         else {
-            throw new Exception("등록되지 않은 이메일입니다.");
+            throw new Exception("[Error]:Email was not matched.");
         }
 
         return ResponseEntity.ok(jwtService.generateToken(email));
@@ -102,16 +103,16 @@ public class AuthenticationService {
         Optional<User> optionalUser = userRepo.findById(id);
 
         if(optionalUser.isEmpty())
-            throw new Exception("등록되지 않은 이메일입니다.");
+            throw new Exception("[Error]: Email was not matched");
 
         User user = optionalUser.get();
 
         if(!user.getStatus())
-            throw new Exception("이미 로그아웃 되어있습니다.");
+            throw new Exception("[Error]: User was already logouted.");
 
         user.setStatus(false);
         userRepo.save(user);
-        return ResponseEntity.ok("로그아웃 되었습니다.");
+        return ResponseEntity.ok("User was succesfully logouted.");
     }
 
     public ResponseEntity<?> getUsers() {
