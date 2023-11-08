@@ -59,7 +59,9 @@ class _RegisterState extends State<Register> {
             hintText: 'Password',
             hintStyle: TextStyle(color: HexColor("#ACB5BD")),
             contentPadding:
-                EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0)));
+                EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0)),
+            obscureText: true // 비밀번호 안보이도록 하는 것
+    );
   }
 
   TextField realName() {
@@ -110,7 +112,7 @@ class _RegisterState extends State<Register> {
               'Register',
               style: TextStyle(
                 fontSize: 16,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w600, color: Color.fromRGBO(255, 255, 255, 1)
               ),
             ),
             style: ElevatedButton.styleFrom(
@@ -208,8 +210,8 @@ class _RegisterState extends State<Register> {
   Future _PickerImageFromGallery() async {
     var returnedImage = await ImagePicker().pickImage(
         source: ImageSource.gallery,
-        maxHeight: 75,
-        maxWidth: 75,
+        // maxHeight: 75,
+        // maxWidth: 75,
         imageQuality: 100
     );
 
@@ -242,17 +244,13 @@ class _RegisterState extends State<Register> {
 
     _formdata = FormData.fromMap({
       "request": MultipartFile.fromString(jsonEncode(request), contentType: MediaType.parse("application/json")),
-      "profile" : MultipartFile.fromFile(imagePath!)
+      "profile" : MultipartFile.fromFileSync(imagePath!)
     });
 
     final response = await dio.post("/api/auth/register", data: _formdata);
 
-    if(response.statusCode == 200) {
-      print(response.data);
-    }
-    else {
-      print(response.statusCode);
-      print(response.statusMessage);
+    if(response.statusCode == 201) {
+      Navigator.pop(context);
     }
   }
 }

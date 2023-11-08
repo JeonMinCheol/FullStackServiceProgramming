@@ -1,7 +1,11 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:fullstack_front/Configuration.dart';
+import 'package:fullstack_front/MainPage.dart';
 import 'package:fullstack_front/Register.dart';
+import 'package:provider/provider.dart';
 import 'HexColor.dart';
 
 class Login extends StatefulWidget {
@@ -11,9 +15,9 @@ class Login extends StatefulWidget {
 }
 
 class _LogInState extends State<Login> {
+  final Configuration configuration = Configuration();
   TextEditingController emailTextController = TextEditingController();
   TextEditingController passwordTextController = TextEditingController();
-  String baseUrl = "http://163.180.117.35:8080/";
 
   @override
   Widget build(BuildContext context) {
@@ -128,6 +132,7 @@ class _LogInState extends State<Login> {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
+                color: Color.fromRGBO(255, 255, 255, 1)
               ),
             ),
             style: ElevatedButton.styleFrom(
@@ -195,25 +200,17 @@ class _LogInState extends State<Login> {
     });
 
     if(response.statusCode == 200) {
-      showSnackBar(context, Text("success"));
-      print(response.data);
+      context.read<Configuration>().token = response.data; // provider에 토큰 값 저장
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => MainPage()),
+      );
     }
     else {
-      showSnackBar(context, Text(response.data));
+      configuration.showSnackBar(context, Text(response.data));
     }
-}
-
-  void showSnackBar(BuildContext context, Text text) {
-  final snackBar = SnackBar(
-    content: text,
-    backgroundColor: HexColor("#002de3"),
-  );
-
-// Find the ScaffoldMessenger in the widget tree
-// and use it to show a SnackBar.
-  ScaffoldMessenger.of(context).showSnackBar(snackBar);
-}
-
+  }
 }
 
 class NextPage extends StatelessWidget {
@@ -224,3 +221,4 @@ class NextPage extends StatelessWidget {
     return Container();
   }
 }
+

@@ -1,7 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_provider/flutter_provider.dart';
+import 'package:fullstack_front/Configuration.dart';
+import 'package:provider/provider.dart';
 import 'Login.dart';
 void main() {
-  runApp(const MyApp());
+  runApp(
+      MultiProvider(
+          providers: [
+            ChangeNotifierProvider<Configuration>(
+                create: (BuildContext context) => Configuration()
+            )],
+          child: const MyApp()));
+
 }
 
 class MyApp extends StatelessWidget {
