@@ -26,12 +26,12 @@ class _BtmBarState extends State<BtmBar> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> screenList = [Text('홈스크린'), Text('마이 스크린')];
+    List<Widget> screenList = [const Text('홈스크린'), const Text('마이 스크린')];
 
     return BottomNavigationBar(
       currentIndex: _index,
       selectedItemColor: Colors.indigo,
-      items: [
+      items: const [
         BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chats'),
         BottomNavigationBarItem(icon: Icon(Icons.add_circle_outline), label: 'More')
       ],
