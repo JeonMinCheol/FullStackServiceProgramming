@@ -127,13 +127,13 @@ class _RegisterState extends State<Register> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text(
-            '로그인',
+          title: const Text(
+            '회원가입',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
           ),
           elevation: 0.0,
           leading: IconButton(
-              icon: Icon(
+              icon: const Icon(
                 FontAwesomeIcons.arrowRotateLeft,
                 size: 16,
               ),
@@ -149,7 +149,7 @@ class _RegisterState extends State<Register> {
             },
             child: SingleChildScrollView(
                 child: Column(children: [
-              Padding(padding: EdgeInsets.only(top: 10)),
+              const Padding(padding: EdgeInsets.only(top: 10)),
               Center(
                 child: profileImageSelector()
               ),
@@ -159,24 +159,24 @@ class _RegisterState extends State<Register> {
                         primaryColor: Colors.grey,
                       ),
                       child: Container(
-                        padding: EdgeInsets.symmetric(
+                        padding: const EdgeInsets.symmetric(
                             vertical: 19.0, horizontal: 30),
                         child: Builder(builder: (context) {
                           return Column(children: [
                             email(),
-                            SizedBox(
+                            const SizedBox(
                               height: 24.0,
                             ), // 공백
                             password(),
-                            SizedBox(
+                            const SizedBox(
                               height: 24.0,
                             ), // 공백
                             realName(),
-                            SizedBox(
+                            const SizedBox(
                               height: 24.0,
                             ), // 공백
                             profileName(),
-                            SizedBox(
+                            const SizedBox(
                               height: 24.0,
                             ), // 공백
                             registerButton(context)
@@ -194,7 +194,7 @@ class _RegisterState extends State<Register> {
                       width: 100,
                       height: 100,
                       decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(50)),
+                          borderRadius: const BorderRadius.all(Radius.circular(50)),
                           color: Colors.transparent,
                           image: DecorationImage(
                               image:profileImage,
@@ -210,9 +210,7 @@ class _RegisterState extends State<Register> {
   Future _PickerImageFromGallery() async {
     var returnedImage = await ImagePicker().pickImage(
         source: ImageSource.gallery,
-        // maxHeight: 75,
-        // maxWidth: 75,
-        imageQuality: 100
+        imageQuality: 50
     );
 
     if(returnedImage == null) return ;

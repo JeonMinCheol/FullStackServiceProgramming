@@ -2,9 +2,10 @@ import 'dart:developer';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:fullstack_front/Configuration.dart';
 import 'package:fullstack_front/MainPage.dart';
-import 'package:fullstack_front/Register.dart';
+import 'package:fullstack_front/RegisterPage.dart';
 import 'package:provider/provider.dart';
 import 'HexColor.dart';
 
@@ -16,22 +17,22 @@ class Login extends StatefulWidget {
 
 class _LogInState extends State<Login> {
   final Configuration configuration = Configuration();
+  static final storage = FlutterSecureStorage();
   TextEditingController emailTextController = TextEditingController();
   TextEditingController passwordTextController = TextEditingController();
+
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _getUserInfo();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          // title: Text('Log in'),
-          // elevation: 0.0,
-          // backgroundColor: Colors.redAccent,
-          // centerTitle: true,
-          // 아래 줄은 메인 페이지에서 활용할 수 있음.
-          // leading: IconButton(icon: Icon(Icons.menu), onPressed: () {}),
-          // actions: <Widget>[
-          //   IconButton(icon: Icon(Icons.search), onPressed: () {})
-          // ],
           ),
       // email, password 입력하는 부분을 제외한 화면을 탭하면, 키보드 사라지게 GestureDetector 사용
       body: GestureDetector(
@@ -201,6 +202,14 @@ class _LogInState extends State<Login> {
 
     if(response.statusCode == 200) {
       context.read<Configuration>().token = response.data; // provider에 토큰 값 저장
+
+      // storage에 토큰 저장 (앱 강제종료 시 로그인 가능)
+      if (await storage.read(key: 'token') == null)
+        await storage.write(
+          key: 'token',
+          value: response.data,
+        );
+
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -211,14 +220,19 @@ class _LogInState extends State<Login> {
       configuration.showSnackBar(context, Text(response.data));
     }
   }
-}
 
-class NextPage extends StatelessWidget {
-  const NextPage({super.key});
+  void _getUserInfo() async {
+    // read 함수로 key값에 맞는 정보를 불러오고 데이터타입은 String 타입
+    // 데이터가 없을때는 null을 반환
+    dynamic userInfo = await storage.read(key:'token');
 
-  @override
-  Widget build(BuildContext context) {
-    return Container();
+    // user의 정보가 있다면 메인 페이지로 바로 이동.
+    if (userInfo != null) {
+      Configuration().logoutRequest(userInfo);
+      await storage.delete(key:'token');
+    } else {
+      print('로그인이 필요합니다');
+    }
   }
 }
 
