@@ -1,7 +1,6 @@
-import 'dart:developer';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:fullstack_front/Configuration.dart';
 import 'package:fullstack_front/MainPage.dart';
@@ -10,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'HexColor.dart';
 
 class Login extends StatefulWidget {
+  const Login({super.key});
 
   @override
   State<Login> createState() => _LogInState();
@@ -17,13 +17,14 @@ class Login extends StatefulWidget {
 
 class _LogInState extends State<Login> {
   final Configuration configuration = Configuration();
-  static final storage = FlutterSecureStorage();
+  static const storage = FlutterSecureStorage();
   TextEditingController emailTextController = TextEditingController();
   TextEditingController passwordTextController = TextEditingController();
 
 
   @override
   void initState() {
+    super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _getUserInfo();
     });
@@ -42,8 +43,8 @@ class _LogInState extends State<Login> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              Padding(padding: EdgeInsets.only(top: 50)),
-              Center(
+              const Padding(padding: EdgeInsets.only(top: 50)),
+              const Center(
                   child: Text("로그인",
                       style: TextStyle(
                         fontSize: 24,
@@ -56,21 +57,21 @@ class _LogInState extends State<Login> {
                 ),
                 child: Container(
                     padding:
-                        EdgeInsets.symmetric(vertical: 50.0, horizontal: 30),
+                        const EdgeInsets.symmetric(vertical: 50.0, horizontal: 30),
                     child: Builder(builder: (context) {
                       return Column(
                         children: [
                           email(),
-                          SizedBox(
+                          const SizedBox(
                             height: 24.0,
                           ), // 공백
 
                           password(),
-                          SizedBox(
+                          const SizedBox(
                             height: 30.0,
                           ), // 공백
 
-                          Text("아직 계정이 없으신가요?",
+                          const Text("아직 계정이 없으신가요?",
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
@@ -92,20 +93,20 @@ class _LogInState extends State<Login> {
                                       padding: EdgeInsets.zero,
                                       tapTargetSize:
                                           MaterialTapTargetSize.shrinkWrap,
-                                      minimumSize: Size(0, 0)),
-                                  child: Text("여기",
+                                      minimumSize: const Size(0, 0)),
+                                  child: const Text("여기",
                                       style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w600,
                                       ))),
-                              Text("를 눌러 회원가입 해보세요",
+                              const Text("를 눌러 회원가입 해보세요",
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
                                   )),
                             ],
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 30,
                           ),
                           loginButton(context)
@@ -128,19 +129,19 @@ class _LogInState extends State<Login> {
             onPressed: () {
               loginRequest();
             },
-            child: Text(
+            style: ElevatedButton.styleFrom(
+              minimumSize: const Size(400, 50),
+              backgroundColor: HexColor("#002de3"),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30.0)),
+            ),
+            child: const Text(
               'Login',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: Color.fromRGBO(255, 255, 255, 1)
               ),
-            ),
-            style: ElevatedButton.styleFrom(
-              minimumSize: Size(400, 50),
-              backgroundColor: HexColor("#002de3"),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30.0)),
             )));
   }
 
@@ -159,7 +160,7 @@ class _LogInState extends State<Login> {
           hintText: 'Password',
           hintStyle: TextStyle(color: HexColor("#ACB5BD")),
           contentPadding:
-              EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0)),
+              const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0)),
       keyboardType: TextInputType.text,
       obscureText: true, // 비밀번호 안보이도록 하는 것
     );
@@ -181,14 +182,14 @@ class _LogInState extends State<Login> {
           hintStyle: TextStyle(color: HexColor("#ACB5BD")),
           hintText: 'Email',
           contentPadding:
-              EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0)),
+              const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0)),
       keyboardType: TextInputType.emailAddress,
     );
   }
 
   Future loginRequest() async {
     Dio dio = Dio();
-    dio.options.baseUrl=Configuration().baseUrl;
+    dio.options.baseUrl=dotenv.env["BASE_URL"]!;
     dio.options.contentType = "application/json";
     dio.options.responseType = ResponseType.plain;
     dio.options.validateStatus = (status) {
@@ -201,19 +202,22 @@ class _LogInState extends State<Login> {
     });
 
     if(response.statusCode == 200) {
+      // ignore: use_build_context_synchronously
       context.read<Configuration>().token = response.data; // provider에 토큰 값 저장
 
       // storage에 토큰 저장 (앱 강제종료 시 로그인 가능)
-      if (await storage.read(key: 'token') == null)
+      if (await storage.read(key: 'token') == null) {
         await storage.write(
           key: 'token',
           value: response.data,
         );
+      }
 
+      // ignore: use_build_context_synchronously
       Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => MainPage()),
+            builder: (context) => const MainPage()),
       );
     }
     else {
@@ -228,10 +232,8 @@ class _LogInState extends State<Login> {
 
     // user의 정보가 있다면 메인 페이지로 바로 이동.
     if (userInfo != null) {
-      Configuration().logoutRequest(userInfo);
-      await storage.delete(key:'token');
-    } else {
-      print('로그인이 필요합니다');
+      // ignore: use_build_context_synchronously
+      Navigator.push(context, MaterialPageRoute(builder: (context) => const MainPage()));
     }
   }
 }

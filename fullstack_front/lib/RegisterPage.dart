@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fullstack_front/Configuration.dart';
 import 'package:image_picker/image_picker.dart';
 import 'HexColor.dart';
@@ -41,7 +42,7 @@ class _RegisterState extends State<Register> {
             hintText: 'Email',
             hintStyle: TextStyle(color: HexColor("#ACB5BD")),
             contentPadding:
-                EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0)));
+                const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0)));
   }
 
   TextField password() {
@@ -59,7 +60,7 @@ class _RegisterState extends State<Register> {
             hintText: 'Password',
             hintStyle: TextStyle(color: HexColor("#ACB5BD")),
             contentPadding:
-                EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0)),
+                const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0)),
             obscureText: true // 비밀번호 안보이도록 하는 것
     );
   }
@@ -79,7 +80,7 @@ class _RegisterState extends State<Register> {
             hintText: 'Real Name',
             hintStyle: TextStyle(color: HexColor("#ACB5BD")),
             contentPadding:
-                EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0)));
+                const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0)));
   }
 
   TextField profileName() {
@@ -97,7 +98,7 @@ class _RegisterState extends State<Register> {
             hintText: 'Profile Name',
             hintStyle: TextStyle(color: HexColor("#ACB5BD")),
             contentPadding:
-                EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0)));
+                const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0)));
   }
 
   ButtonTheme registerButton(BuildContext context) {
@@ -108,18 +109,18 @@ class _RegisterState extends State<Register> {
             onPressed: () {
               _registerRequest();
             },
-            child: Text(
+            style: ElevatedButton.styleFrom(
+              minimumSize: const Size(400, 50),
+              backgroundColor: HexColor("#002de3"),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30.0)),
+            ),
+            child: const Text(
               'Register',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600, color: Color.fromRGBO(255, 255, 255, 1)
               ),
-            ),
-            style: ElevatedButton.styleFrom(
-              minimumSize: Size(400, 50),
-              backgroundColor: HexColor("#002de3"),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30.0)),
             )));
   }
 
@@ -225,7 +226,7 @@ class _RegisterState extends State<Register> {
   Future _registerRequest() async {
     Dio dio = Dio();
 
-    dio.options.baseUrl=Configuration().baseUrl;
+    dio.options.baseUrl=dotenv.env["BASE_URL"]!;
     dio.options.responseType = ResponseType.plain;
     dio.options.validateStatus = (status) {
       return status! < 500;

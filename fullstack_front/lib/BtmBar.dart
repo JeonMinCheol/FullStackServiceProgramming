@@ -1,7 +1,10 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'Settings.dart';
+
 class BtmBar extends StatefulWidget {
+  const BtmBar({super.key});
+
   @override
   State<StatefulWidget> createState() => _BtmBarState();
 
@@ -13,6 +16,7 @@ class _BtmBarState extends State<BtmBar> with SingleTickerProviderStateMixin {
 
   void _onItemTapped(int index) {
     setState(() {
+      Navigator.push(context, MaterialPageRoute(builder: (context) => Settings()));
       _index = index;
     });
   }
@@ -36,9 +40,7 @@ class _BtmBarState extends State<BtmBar> with SingleTickerProviderStateMixin {
         BottomNavigationBarItem(icon: Icon(Icons.add_circle_outline), label: 'More')
       ],
       onTap: (value) {
-        setState(() { //상태 갱신이 되지 않으면 동작을 하지 않음
           _onItemTapped(value);
-        });
       },
     );
   }
