@@ -1,44 +1,73 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fullstack_front/BtmBar.dart';
 import 'package:fullstack_front/Configuration.dart';
 import 'package:provider/provider.dart';
 
-class MainPage extends StatefulWidget {
+import 'SearchPage.dart';
+import 'FriendDTO.dart';
+
+class MainPage extends StatefulWidget{
+  const MainPage({super.key});
+
   @override
   State<MainPage> createState() => _MainState();
-
 }
 
-class _MainState extends State<MainPage>{
-  Configuration configuration = Configuration();
-  Future<bool> _popEvent() async{
+class _MainState extends State<MainPage> with WidgetsBindingObserver{
+  late String token;
+  List<FriendDTO>? friendList;
 
+  // friendList
+  void _getFriendList() async {
+    showDialog(
+        context: context,
+        builder: (context) => const Center(child:CircularProgressIndicator()));
+
+    Dio dio = Dio();
+    dio.options.baseUrl = dotenv.env["BASE_URL"]!;
+    dio.options.headers = {
+      "Authorization": "Bearer ${context
+          .read<Configuration>()
+          .token}"
+    };
+
+    final response = await dio.get("/api/friend");
+
+    if(response.statusCode == 202) {
+      List<dynamic> jsonList = response.data;
+      setState(() {
+          friendList = jsonList.map((json) => FriendDTO.fromJson(json)).toList();
+      });
+    }
+  }
+
+  void _moveToFindPage() {
+    Navigator.push(context, MaterialPageRoute(builder: (context) => SearchPage()));
+  }
+
+  // logout
+  Future<bool> _popEvent() async{
     return await showDialog(context: context, builder: (BuildContext context) {
       return AlertDialog(
         actions: [
-          TextButton(onPressed: () {
-            Dio dio = Dio();
-            dio.options.baseUrl=Configuration().baseUrl;
-            dio.options.responseType = ResponseType.plain;
-            dio.options.validateStatus = (status) {
-              return status! < 500;
-            };
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              TextButton(onPressed: () async {
+                SystemNavigator.pop();
+              }, child: const Text("종료")),
 
-            dio.options.headers= {"Authorization" : "Bearer " + context.read<Configuration>().token};
-            dynamic response = dio.get("/api/auth/logout");
+              TextButton(onPressed: () {
+                Navigator.pop(context, false);
+              }, child: const Text("취소"))
+            ],
+          )
 
-            Navigator.pop(
-              context,
-              true
-            );
-          }, child: Text("종료")),
-
-          TextButton(onPressed: () {
-            Navigator.pop(context, false);
-            }, child: Text("취소"))
         ],
       );
     });
@@ -46,11 +75,24 @@ class _MainState extends State<MainPage>{
   }
 
   @override
+  void initState() {
+    super.initState();
+    token = context.read<Configuration>().token;
+    _getFriendList();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // ignore: deprecated_member_use
     return  WillPopScope(child: Scaffold(
       appBar: AppBar(
           shape: (
-            Border(
+            const Border(
               bottom: BorderSide(
                 color : Colors.black12,
                 width:1
@@ -58,24 +100,34 @@ class _MainState extends State<MainPage>{
             )
           ),
           title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              SizedBox.fromSize(size:Size(1,10)),
+              SizedBox.fromSize(size:const Size(1,10)),
 
-              Text("Friends",
+              const Text("Friends",
                 style: TextStyle(fontSize:20, fontWeight: FontWeight.w600),
               ),
 
-              SizedBox.fromSize(size:Size(250,10)),
+              SizedBox.fromSize(size:const Size(250,10)),
 
-              IconButton(icon: Icon(Icons.add_circle, size:28, weight: 600,), onPressed: () {
-                // do something
+              IconButton(icon: const Icon(Icons.add_circle, size:28, weight: 600,), onPressed: () {
+                _moveToFindPage();
               }),
 
-              SizedBox.fromSize(size:Size(1,10)),
+              SizedBox.fromSize(size:const Size(1,10)),
             ],
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
           ),
           automaticallyImplyLeading: false
+      ),
+
+      body: ListView.builder(
+        itemCount: (friendList == null) ? 1 :friendList!.length,
+        itemBuilder: (BuildContext context, int index) {
+          return SizedBox(
+            height: 100,
+            child: (friendList == null) ? const Text("생성된 대화방이 없습니다.") : Text(friendList![index].nickName),
+          );
+        },
       ),
 
       bottomNavigationBar: BtmBar(),
@@ -84,3 +136,4 @@ class _MainState extends State<MainPage>{
     });
   }
 }
+

@@ -1,27 +1,24 @@
-class UserDTO {
+class FriendDTO {
   final int id;
-  final String name;
   final String nickName;
   final String email;
-  final String role;
+  final int targetId;
   final String path;
 
-  UserDTO({
+  FriendDTO({
     required this.id,
     required this.nickName,
-    required this.name,
     required this.email,
-    required this.role,
+    required this.targetId,
     required this.path,
   });
 
-  factory UserDTO.fromJson(Map<String, dynamic> json) {
-    return UserDTO(
+  factory FriendDTO.fromJson(Map<String, dynamic> json) {
+    return FriendDTO(
       id: json['id'],
-      name: json['name'],
       nickName: json['nickName'],
       email: json['email'],
-      role: json['role'],
+      targetId: json['targetId'],
       path: json['path'],
     );
   }

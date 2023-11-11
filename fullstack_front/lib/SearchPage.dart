@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
@@ -8,6 +7,8 @@ import 'Configuration.dart';
 import 'UserDTO.dart';
 
 class SearchPage extends StatefulWidget{
+  const SearchPage({super.key});
+
   @override
   State<StatefulWidget> createState() => _SearchPageState();
 }
@@ -15,10 +16,9 @@ class SearchPage extends StatefulWidget{
 class _SearchPageState extends State<SearchPage> {
   TextEditingController searchBartextController = TextEditingController();
   UserDTO? user;
+  final bool _visibility = false;
 
-  void findUser() async {
-    //
-
+  void findUser(String userName) async {
     Dio dio = Dio();
     dio.options.baseUrl = dotenv.env["BASE_URL"]!;
     dio.options.headers = {
@@ -27,14 +27,32 @@ class _SearchPageState extends State<SearchPage> {
           .token}"
     };
 
-    final response = await dio.get("/api/user/${searchBartextController.text}");
-
-    if(response.statusCode == 202) {
-      dynamic json = response.data;
+    try{
+      dynamic response = await dio.get("/api/user/$userName");
+      if(response.statusCode == 202) {
+        setState(() => {user = UserDTO.fromJson(response.data)});
+      }
+    }
+    on Exception{
       setState(() {
-        user = UserDTO.fromJson(json);
+        user = null;
       });
     }
+  }
+
+  void makeFriend(String userName) async {
+    Dio dio = Dio();
+    dio.options.baseUrl = dotenv.env["BASE_URL"]!;
+    dio.options.headers = {
+      "Authorization": "Bearer ${context
+          .read<Configuration>()
+          .token}"
+    };
+
+      dynamic response = await dio.post("/api/friend/$userName");
+      if(response.status != 208) {
+        Navigator.pop(context);
+      }
   }
 
   @override
@@ -57,11 +75,15 @@ class _SearchPageState extends State<SearchPage> {
               style: TextStyle(fontSize:20, fontWeight: FontWeight.w600),
             ),
 
-            SizedBox.fromSize(size:Size(200,10)),
+            SizedBox.fromSize(size:const Size(200,10)),
 
-            IconButton(icon: const Icon(Icons.add, size:28, weight: 600,), onPressed: () {
-              // TODO :
-            }),
+            Visibility(
+                visible: (user == null) ? false : true,
+                child: IconButton(icon: const Icon(Icons.add, size:28, weight: 600,), onPressed: () {
+                  makeFriend(user!.nickName);
+                }),
+            )
+            ,
           ],
         ),
       ),
@@ -70,14 +92,18 @@ class _SearchPageState extends State<SearchPage> {
         child: Column(
           children:[
             SearchBar(
-              onSubmitted: (value) => findUser(),
+              onSubmitted: (value) => {
+                findUser(value),
+              },
             ),
             const SizedBox(
                 height:20
             ),
             Expanded(child: ListView.builder(
                 itemCount: 1,
-                itemBuilder: (context, index) => (user != null) ? Text(user!.nickName) : Text("검색 결과가 존재하지 않습니다.")
+                itemBuilder:  (context, index) {
+                    return (user != null) ? Text(user!.email) : const Text("검색 결과가 없습니다.");
+                }
             ))
           ]
         ),
