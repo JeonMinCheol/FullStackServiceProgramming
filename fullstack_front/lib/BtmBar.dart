@@ -16,7 +16,8 @@ class _BtmBarState extends State<BtmBar> with SingleTickerProviderStateMixin {
 
   void _onItemTapped(int index) {
     setState(() {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => Settings()));
+      if(index == 1)
+        Navigator.push(context, MaterialPageRoute(builder: (context) => Settings()));
       _index = index;
     });
   }

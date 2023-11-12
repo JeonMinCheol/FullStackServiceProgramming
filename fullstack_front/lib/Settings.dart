@@ -6,7 +6,6 @@ import 'package:provider/provider.dart';
 class Settings extends StatefulWidget{
   @override
   State<StatefulWidget> createState() => _SettingsState();
-  
 }
 
 class _SettingsState extends State<Settings>{
@@ -14,7 +13,7 @@ class _SettingsState extends State<Settings>{
   Widget build(BuildContext context) {
     return Scaffold(
       body:TextButton(
-        child: Text("logout"),
+        child: Center(child: Text("logout"),),
         onPressed: () {Configuration().logoutRequest(context.read<Configuration>().token);},
       )
     );

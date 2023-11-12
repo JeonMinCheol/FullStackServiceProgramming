@@ -233,6 +233,7 @@ class _LogInState extends State<Login> {
     // user의 정보가 있다면 메인 페이지로 바로 이동.
     if (userInfo != null) {
       // ignore: use_build_context_synchronously
+      context.read<Configuration>().token = userInfo;
       Navigator.push(context, MaterialPageRoute(builder: (context) => const MainPage()));
     }
   }

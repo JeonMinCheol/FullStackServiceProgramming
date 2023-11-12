@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -16,7 +18,7 @@ class SearchPage extends StatefulWidget{
 class _SearchPageState extends State<SearchPage> {
   TextEditingController searchBartextController = TextEditingController();
   UserDTO? user;
-  final bool _visibility = false;
+  String stateText = "";
 
   void findUser(String userName) async {
     Dio dio = Dio();
@@ -36,6 +38,7 @@ class _SearchPageState extends State<SearchPage> {
     on Exception{
       setState(() {
         user = null;
+        stateText = "검색 결과가 없습니다.";
       });
     }
   }
@@ -48,10 +51,25 @@ class _SearchPageState extends State<SearchPage> {
           .read<Configuration>()
           .token}"
     };
+      try{
+        dynamic status = await dio.post("/api/friend/$userName")..statusCode;
 
-      dynamic response = await dio.post("/api/friend/$userName");
-      if(response.status != 208) {
-        Navigator.pop(context);
+        setState(() {
+          if(status == 200) {
+            user = null;
+            stateText = "친구가 등록되었습니다.";
+          }
+
+          if(status == 208) {
+            user = null;
+            stateText = "이미 등록된 친구입니다.";
+          }
+        });
+
+      } on Exception {
+        setState(() {
+          user = null;
+        });
       }
   }
 
@@ -78,7 +96,6 @@ class _SearchPageState extends State<SearchPage> {
             SizedBox.fromSize(size:const Size(200,10)),
 
             Visibility(
-                visible: (user == null) ? false : true,
                 child: IconButton(icon: const Icon(Icons.add, size:28, weight: 600,), onPressed: () {
                   makeFriend(user!.nickName);
                 }),
@@ -102,7 +119,7 @@ class _SearchPageState extends State<SearchPage> {
             Expanded(child: ListView.builder(
                 itemCount: 1,
                 itemBuilder:  (context, index) {
-                    return (user != null) ? Text(user!.email) : const Text("검색 결과가 없습니다.");
+                    return (user != null) ? Text(user!.email) : Text(stateText);
                 }
             ))
           ]
