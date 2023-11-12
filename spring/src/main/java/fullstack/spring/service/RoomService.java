@@ -12,6 +12,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -38,10 +39,9 @@ public class RoomService {
         User user = userRepo.findByEmail(userEmail).orElseThrow(()->new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
 
        try{
-           //TODO : 오류 발생 지점 (친구가 여러명이네 생각해보니까)
         Friend friend = friendRepo.findByNickNameAndUserId(targetName, user.getId()).orElseThrow(()->new UsernameNotFoundException("친구를 찾을 수 없습니다."));
         if(roomRepo.existsByUserIdAndFriendId(user.getId(), friend.getId()))
-           throw new Exception("방이 이미 존재합니다.");
+           return new ResponseEntity<String>("Already exists.", HttpStatus.ALREADY_REPORTED);
 
            Room room = Room
                    .builder()
