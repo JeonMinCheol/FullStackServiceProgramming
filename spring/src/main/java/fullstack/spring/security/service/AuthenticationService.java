@@ -37,18 +37,12 @@ public class AuthenticationService {
     // 중복 시 에러
 
     public ResponseEntity<?> register(User request, MultipartFile image) throws Exception {
-//
-//        log.info(String.valueOf(request.getId()));
-//        log.info(String.valueOf(request.getNickName()));
-//        log.info(String.valueOf(request.getEmail()));
-
         if(userRepo.findByEmail(request.getEmail()).isPresent())
             throw new SQLException("이미 등록된 이메일입니다");
         else if(userRepo.findByNickName(request.getNickName()).isPresent()){
 
             throw new SQLException("이미 등록된 이름입니다.");
         }
-
 
         User user = User
                 .builder()

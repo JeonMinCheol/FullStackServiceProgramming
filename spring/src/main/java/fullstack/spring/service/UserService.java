@@ -36,10 +36,27 @@ public class UserService {
     @Autowired
     private ProfileRepo profileRepo;
 
+    @Autowired
+    private JwtService jwtService;
+
+    @Autowired
+    private FriendRepo friendRepo;
+
     public ResponseEntity<?> findUser(HttpServletRequest httpServletRequest, String nickName) throws Exception {
         try{
+            // 친구
             User user = userRepo.findByNickName(nickName).get();
+
+            // 친구 프로필
             Optional<Profile> profile = profileRepo.findByUserId(user.getId());
+
+
+            // 나
+            long id = jwtService.extractIdFromHeader(httpServletRequest);
+
+            if(id == user.getId())
+                return new ResponseEntity<>("Target is current user.", HttpStatus.BAD_REQUEST);
+
             String path = null;
 
             path = profile.isPresent() ? profile.get().getPath() : "/profileImg/default-profile.jpg";
@@ -47,7 +64,7 @@ public class UserService {
 
             return new ResponseEntity<>(userDTO, HttpStatus.ACCEPTED);
         } catch (Exception e) {
-            throw new Exception(e);
+            return new ResponseEntity<>("user not founded.", HttpStatus.BAD_REQUEST);
         }
     }
 }

@@ -4,10 +4,12 @@ import fullstack.spring.dto.FriendDTO;
 import fullstack.spring.entity.Friend;
 import fullstack.spring.entity.Profile;
 import fullstack.spring.entity.User;
+import fullstack.spring.repository.CommentRepo;
 import fullstack.spring.repository.FriendRepo;
 import fullstack.spring.repository.ProfileRepo;
 import fullstack.spring.repository.UserRepo;
 import fullstack.spring.security.service.JwtService;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -36,7 +39,9 @@ public class FriendService {
     private MediaService mediaService;
     @Autowired
     private ProfileRepo profileRepo;
-    public void addFriend(HttpServletRequest httpServletRequest, String targetName) throws Exception {
+    @Autowired
+    private CommentRepo commentRepo;
+    public void addFriend(HttpServletRequest httpServletRequest, String targetName) throws RuntimeException, IOException, ServletException {
         try{
             String userEmail = jwtService.extractEmailFromHeader(httpServletRequest);
 
@@ -62,20 +67,25 @@ public class FriendService {
             for (Friend friend : friendRepo.findAllByUserId(user1.getId()).get()) {
                 if(Objects.equals(friend.getTargetId(), user2.getId())) {
                     log.info(friend.getEmail() + friend1.getEmail());
-                    throw new Exception("이미 등록된 친구입니다.");
+                    throw new RuntimeException("이미 등록된 친구입니다.");
                 }
             }
 
             friendRepo.save(friend1);
             friendRepo.save(friend2);
-        } catch (Exception e) {
-            throw new Exception(e);
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e){
+            throw new IOException(e);
+        } catch (ServletException e) {
+            throw new ServletException(e);
         }
     }
 
     public ResponseEntity<?> getFriends(HttpServletRequest httpServletRequest) throws Exception {
         try{
             long id = jwtService.extractIdFromHeader(httpServletRequest);
+            String lastComment = "";
 
             List<FriendDTO> response = new ArrayList<>();
 
@@ -85,6 +95,8 @@ public class FriendService {
 
                 path = profile.isPresent() ? profile.get().getPath() : "/profileImg/default-profile.jpg";
 
+
+
                 response.add(FriendDTO
                         .builder()
                         .id(friend.getId())
@@ -92,6 +104,7 @@ public class FriendService {
                         .path(path)
                         .email(friend.getEmail())
                         .targetId(friend.getTargetId())
+                                .lastComment()
                         .build()
                 );
             });

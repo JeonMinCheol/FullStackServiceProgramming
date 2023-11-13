@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fullstack_front/Configuration.dart';
 import 'package:image_picker/image_picker.dart';
 import 'HexColor.dart';
@@ -41,7 +42,7 @@ class _RegisterState extends State<Register> {
             hintText: 'Email',
             hintStyle: TextStyle(color: HexColor("#ACB5BD")),
             contentPadding:
-                EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0)));
+                const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0)));
   }
 
   TextField password() {
@@ -59,7 +60,7 @@ class _RegisterState extends State<Register> {
             hintText: 'Password',
             hintStyle: TextStyle(color: HexColor("#ACB5BD")),
             contentPadding:
-                EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0)),
+                const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0)),
             obscureText: true // 비밀번호 안보이도록 하는 것
     );
   }
@@ -79,7 +80,7 @@ class _RegisterState extends State<Register> {
             hintText: 'Real Name',
             hintStyle: TextStyle(color: HexColor("#ACB5BD")),
             contentPadding:
-                EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0)));
+                const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0)));
   }
 
   TextField profileName() {
@@ -97,7 +98,7 @@ class _RegisterState extends State<Register> {
             hintText: 'Profile Name',
             hintStyle: TextStyle(color: HexColor("#ACB5BD")),
             contentPadding:
-                EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0)));
+                const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0)));
   }
 
   ButtonTheme registerButton(BuildContext context) {
@@ -108,18 +109,18 @@ class _RegisterState extends State<Register> {
             onPressed: () {
               _registerRequest();
             },
-            child: Text(
+            style: ElevatedButton.styleFrom(
+              minimumSize: const Size(400, 50),
+              backgroundColor: HexColor("#002de3"),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30.0)),
+            ),
+            child: const Text(
               'Register',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600, color: Color.fromRGBO(255, 255, 255, 1)
               ),
-            ),
-            style: ElevatedButton.styleFrom(
-              minimumSize: Size(400, 50),
-              backgroundColor: HexColor("#002de3"),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30.0)),
             )));
   }
 
@@ -127,13 +128,13 @@ class _RegisterState extends State<Register> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text(
-            '로그인',
+          title: const Text(
+            '회원가입',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
           ),
           elevation: 0.0,
           leading: IconButton(
-              icon: Icon(
+              icon: const Icon(
                 FontAwesomeIcons.arrowRotateLeft,
                 size: 16,
               ),
@@ -149,7 +150,7 @@ class _RegisterState extends State<Register> {
             },
             child: SingleChildScrollView(
                 child: Column(children: [
-              Padding(padding: EdgeInsets.only(top: 10)),
+              const Padding(padding: EdgeInsets.only(top: 10)),
               Center(
                 child: profileImageSelector()
               ),
@@ -159,24 +160,24 @@ class _RegisterState extends State<Register> {
                         primaryColor: Colors.grey,
                       ),
                       child: Container(
-                        padding: EdgeInsets.symmetric(
+                        padding: const EdgeInsets.symmetric(
                             vertical: 19.0, horizontal: 30),
                         child: Builder(builder: (context) {
                           return Column(children: [
                             email(),
-                            SizedBox(
+                            const SizedBox(
                               height: 24.0,
                             ), // 공백
                             password(),
-                            SizedBox(
+                            const SizedBox(
                               height: 24.0,
                             ), // 공백
                             realName(),
-                            SizedBox(
+                            const SizedBox(
                               height: 24.0,
                             ), // 공백
                             profileName(),
-                            SizedBox(
+                            const SizedBox(
                               height: 24.0,
                             ), // 공백
                             registerButton(context)
@@ -194,7 +195,7 @@ class _RegisterState extends State<Register> {
                       width: 100,
                       height: 100,
                       decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(50)),
+                          borderRadius: const BorderRadius.all(Radius.circular(50)),
                           color: Colors.transparent,
                           image: DecorationImage(
                               image:profileImage,
@@ -210,9 +211,7 @@ class _RegisterState extends State<Register> {
   Future _PickerImageFromGallery() async {
     var returnedImage = await ImagePicker().pickImage(
         source: ImageSource.gallery,
-        // maxHeight: 75,
-        // maxWidth: 75,
-        imageQuality: 100
+        imageQuality: 50
     );
 
     if(returnedImage == null) return ;
@@ -227,7 +226,7 @@ class _RegisterState extends State<Register> {
   Future _registerRequest() async {
     Dio dio = Dio();
 
-    dio.options.baseUrl=Configuration().baseUrl;
+    dio.options.baseUrl=dotenv.env["BASE_URL"]!;
     dio.options.responseType = ResponseType.plain;
     dio.options.validateStatus = (status) {
       return status! < 500;

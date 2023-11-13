@@ -1,11 +1,14 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 
 import 'HexColor.dart';
 
 class Configuration with ChangeNotifier{
-  String _baseUrl = "http://172.21.94.197:8080";
   String _token = "EMPTY_TOKEN";
+  static const storage = FlutterSecureStorage();
 
   void showSnackBar(BuildContext context, Text text) {
     final snackBar = SnackBar(
@@ -16,22 +19,25 @@ class Configuration with ChangeNotifier{
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
+  Future<dynamic> logoutRequest(String token) async {
+    Dio dio = Dio();
+    dio.options.baseUrl=dotenv.env["BASE_URL"]!;
+    dio.options.responseType = ResponseType.plain;
+    dio.options.validateStatus = (status) {
+      return status! < 500;
+    };
+
+    dio.options.headers= {"Authorization" : "Bearer $token"};
+    dio.get("/api/auth/logout");
+
+    // 로그아웃 시 토큰 제거
+    storage.delete(key: 'token');
+  }
+
   String get token => _token;
 
   set token(String value) {
     _token = value;
-    notifyListeners();
-  }
-
-  String get baseUrl => _baseUrl;
-
-  set baseUrl(String value) {
-    _baseUrl = value;
-    notifyListeners();
-  }
-
-  void setToken(String token) {
-    _token =token;
     notifyListeners();
   }
 }
