@@ -1,12 +1,8 @@
 package fullstack.spring.service;
 
 import fullstack.spring.dto.RoomDTO;
-import fullstack.spring.entity.Friend;
-import fullstack.spring.entity.Room;
-import fullstack.spring.entity.User;
-import fullstack.spring.repository.FriendRepo;
-import fullstack.spring.repository.RoomRepo;
-import fullstack.spring.repository.UserRepo;
+import fullstack.spring.entity.*;
+import fullstack.spring.repository.*;
 import fullstack.spring.security.service.JwtService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -32,13 +29,17 @@ public class RoomService {
     private UserRepo userRepo;
     @Autowired
     private FriendRepo friendRepo;
+    @Autowired
+    private CommentRepo commentRepo;
+    @Autowired
+    private ProfileRepo profileRepo;
+
 
     public ResponseEntity<?> createRoom(HttpServletRequest httpServletRequest, String targetName) throws Exception {
         String userEmail = jwtService.extractEmailFromHeader(httpServletRequest);
         User user = userRepo.findByEmail(userEmail).orElseThrow(()->new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
 
        try{
-           //TODO : 오류 발생 지점 (친구가 여러명이네 생각해보니까)
         Friend friend = friendRepo.findByNickNameAndUserId(targetName, user.getId()).orElseThrow(()->new UsernameNotFoundException("친구를 찾을 수 없습니다."));
         if(roomRepo.existsByUserIdAndFriendId(user.getId(), friend.getId()))
            throw new Exception("방이 이미 존재합니다.");
@@ -61,29 +62,72 @@ public class RoomService {
 
     public ResponseEntity<?> getRooms(HttpServletRequest httpServletRequest) throws Exception {
         String userEmail = jwtService.extractEmailFromHeader(httpServletRequest);
-        User user = userRepo.findByEmail(userEmail).orElseThrow(()->new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
 
+        // user는 현재 서비스를 요청한 유저
+        User user = userRepo.findByEmail(userEmail).orElseThrow(()->new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
         List<RoomDTO> rooms = new ArrayList<>();
 
         // 내가 생성한 경우 찾기 위해서
         roomRepo.findAllByUserId(user.getId()).get().forEach(room -> {
-            rooms.add(RoomDTO
-                    .builder()
-                            .id(room.getId())
-                            .user1(room.getUser().getId())
-                            .user2(room.getFriend().getTargetId())
-                    .build());
+            Optional<Comment> lastComment = commentRepo.getLastComment(room.getId());
+
+            Optional<Profile> profile = profileRepo.findByUserId(room.getFriend().getTargetId());
+            String path = null;
+
+            path = profile.isPresent() ? profile.get().getPath() : "/profileImg/default-profile.jpg";
+
+            if(lastComment.isPresent())
+                rooms.add(RoomDTO
+                        .builder()
+                        .id(room.getId())
+                        .user1(room.getUser().getId())
+                        .user2(room.getFriend().getTargetId())
+                        .lastComment(lastComment.get().getText())
+                        .path(path)
+                        .nickName(room.getFriend().getNickName())
+                        .build());
+            else
+                rooms.add(RoomDTO
+                        .builder()
+                        .id(room.getId())
+                        .user1(room.getUser().getId())
+                        .user2(room.getFriend().getTargetId())
+                        .lastComment(null)
+                        .path(path)
+                        .nickName(room.getFriend().getNickName())
+                        .build());
         });
 
         // TODO : 여기 코드 바꿔야함 (현재 로직과 성립되지 않음)
         // 상대가 생성한 경우 찾기 위해서
         roomRepo.findAllByTarget(user.getId()).get().forEach(room -> {
-            rooms.add(RoomDTO
+            Optional<Comment> lastComment = commentRepo.getLastComment(room.getId());
+
+            Optional<Profile> profile = profileRepo.findByUserId(room.getFriend().getTargetId());
+            String path = null;
+
+            path = profile.isPresent() ? profile.get().getPath() : "/profileImg/default-profile.jpg";
+
+            if(lastComment.isPresent())
+                rooms.add(RoomDTO
                     .builder()
                     .id(room.getId())
                     .user1(room.getUser().getId())
                     .user2(room.getFriend().getTargetId())
+                    .lastComment(lastComment.get().getText())
+                    .path(path)
+                    .nickName(room.getFriend().getNickName())
                     .build());
+            else
+                rooms.add(RoomDTO
+                        .builder()
+                        .id(room.getId())
+                        .user1(room.getUser().getId())
+                        .user2(room.getFriend().getTargetId())
+                        .lastComment(null)
+                        .path(path)
+                        .nickName(room.getFriend().getNickName())
+                        .build());
         });
 
         return new ResponseEntity<>(rooms, HttpStatusCode.valueOf(200));
