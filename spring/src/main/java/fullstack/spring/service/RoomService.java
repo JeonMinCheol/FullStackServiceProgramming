@@ -4,7 +4,6 @@ import fullstack.spring.dto.RoomDTO;
 import fullstack.spring.entity.*;
 import fullstack.spring.repository.*;
 import fullstack.spring.security.service.JwtService;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -31,7 +29,7 @@ public class RoomService {
     @Autowired
     private FriendRepo friendRepo;
     @Autowired
-    private CommentRepo commentRepo;
+    private ChatRepo chatRepo;
     @Autowired
     private ProfileRepo profileRepo;
 
@@ -70,7 +68,7 @@ public class RoomService {
 
         // 내가 생성한 경우 찾기 위해서
         roomRepo.findAllByUserId(user.getId()).get().forEach(room -> {
-            Optional<Comment> lastComment = commentRepo.getLastComment(room.getId());
+            Optional<Comment> lastComment = chatRepo.getLastChat(room.getId());
 
             Optional<Profile> profile = profileRepo.findByUserId(room.getFriend().getTargetId());
             String path = null;
@@ -102,7 +100,7 @@ public class RoomService {
         // TODO : 여기 코드 바꿔야함 (현재 로직과 성립되지 않음)
         // 상대가 생성한 경우 찾기 위해서
         roomRepo.findAllByTarget(user.getId()).get().forEach(room -> {
-            Optional<Comment> lastComment = commentRepo.getLastComment(room.getId());
+            Optional<Comment> lastComment = chatRepo.getLastChat(room.getId());
 
             Optional<Profile> profile = profileRepo.findByUserId(room.getFriend().getTargetId());
             String path = null;

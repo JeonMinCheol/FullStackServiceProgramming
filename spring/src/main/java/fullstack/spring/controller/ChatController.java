@@ -1,11 +1,11 @@
 package fullstack.spring.controller;
 
-import fullstack.spring.dto.CommentDTO;
+import fullstack.spring.dto.ChatDTO;
 import fullstack.spring.dto.TranslateDataDTO;
 import fullstack.spring.entity.Comment;
-import fullstack.spring.repository.CommentRepo;
+import fullstack.spring.repository.ChatRepo;
 import fullstack.spring.security.service.JwtService;
-import fullstack.spring.service.CommentService;
+import fullstack.spring.service.ChatService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,31 +17,32 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api" , produces = "application/json; charset=utf8")
-public class CommentController {
+public class ChatController {
     @Autowired
-    private CommentService commentService;
+    private ChatService chatService;
     @Autowired
-    private CommentRepo commentRepo;
+    private ChatRepo chatRepo;
     @Autowired
     private JwtService jwtService;
 
-    @PostMapping("/room/{roomId}/comment")
-    public ResponseEntity<?> addComment(HttpServletRequest httpServletRequest, @PathVariable long roomId, @RequestPart TranslateDataDTO comment, @RequestPart(required = false) MultipartFile image) {
+    // Postman test용
+    @PostMapping("/room/{roomId}/chat")
+    public ResponseEntity<?> addChat(HttpServletRequest httpServletRequest, @PathVariable long roomId, @RequestPart TranslateDataDTO comment, @RequestPart(required = false) MultipartFile image) {
         try {
-            commentService.addComment_http(httpServletRequest,roomId, comment, image);
+            chatService.addChat_http(httpServletRequest,roomId, comment, image);
             return ResponseEntity.ok("성공");
         } catch (Exception e) {
             return ResponseEntity.ok(e.getMessage());
         }
     }
 
-    @GetMapping("/room/{roomId}/comment")
-    public ResponseEntity<?> getComment(HttpServletRequest httpServletRequest, @PathVariable long roomId) {
+    @GetMapping("/room/{roomId}/chat")
+    public ResponseEntity<?> getChat(HttpServletRequest httpServletRequest, @PathVariable long roomId) {
         try {
-            List<Comment> comments = commentRepo.findAllByUserIdAndRoomId(jwtService.extractIdFromHeader(httpServletRequest), roomId).get();
-            List<CommentDTO> response = new ArrayList<>();
+            List<Comment> comments = chatRepo.findAllByUserIdAndRoomId(jwtService.extractIdFromHeader(httpServletRequest), roomId).get();
+            List<ChatDTO> response = new ArrayList<>();
 
-            comments.forEach(comment -> response.add(CommentDTO
+            comments.forEach(comment -> response.add(ChatDTO
                     .builder()
                     .id(comment.getId())
                     .userId(comment.getUser().getId())
@@ -55,13 +56,13 @@ public class CommentController {
         }
     }
 
-    @GetMapping("/room/{roomId}/comments")
-    public ResponseEntity<?> getComments(HttpServletRequest httpServletRequest, @PathVariable long roomId) {
+    @GetMapping("/room/{roomId}/chats")
+    public ResponseEntity<?> getChats(HttpServletRequest httpServletRequest, @PathVariable long roomId) {
         try {
-            List<Comment> comments = commentRepo.findAllByRoomId(roomId).get();
-            List<CommentDTO> response = new ArrayList<>();
+            List<Comment> comments = chatRepo.findAllByRoomId(roomId).get();
+            List<ChatDTO> response = new ArrayList<>();
 
-            comments.forEach(comment -> response.add(CommentDTO
+            comments.forEach(comment -> response.add(ChatDTO
                     .builder()
                     .id(comment.getId())
                     .userId(comment.getUser().getId())

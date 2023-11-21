@@ -8,7 +8,7 @@ import fullstack.spring.entity.Comment;
 import fullstack.spring.entity.ImageType;
 import fullstack.spring.entity.Room;
 import fullstack.spring.entity.User;
-import fullstack.spring.repository.CommentRepo;
+import fullstack.spring.repository.ChatRepo;
 import fullstack.spring.repository.RoomRepo;
 import fullstack.spring.repository.UserRepo;
 import fullstack.spring.security.service.JwtService;
@@ -25,9 +25,9 @@ import java.util.Arrays;
 
 @Slf4j
 @Service
-public class CommentService {
+public class ChatService {
     @Autowired
-    private CommentRepo commentRepo;
+    private ChatRepo chatRepo;
 
     @Autowired
     private JwtService jwtService;
@@ -46,7 +46,7 @@ public class CommentService {
 
     private JSONParser parser = new JSONParser();
 
-    public void addComment_http(HttpServletRequest httpServletRequest, long roomId, TranslateDataDTO content, MultipartFile image) throws Exception {
+    public void addChat_http(HttpServletRequest httpServletRequest, long roomId, TranslateDataDTO content, MultipartFile image) throws Exception {
         String userEmail = jwtService.extractEmailFromHeader(httpServletRequest);
 
         User user = userRepo.findByEmail(userEmail).orElseThrow(()->new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
@@ -66,7 +66,7 @@ public class CommentService {
                 .image(imageUrl)
                 .build();
 
-        commentRepo.save(comment);
+        chatRepo.save(comment);
     }
 
 
@@ -99,10 +99,8 @@ public class CommentService {
                 .image(Arrays.toString(binaryImage)) // chat에서 이미지를 base64로 인코딩해서 서버로 전달
                 .build();
 
-        commentRepo.save(comment);
+        chatRepo.save(comment);
 
         return new ChatResponseDTO(comment);
     }
-
-    public
 }

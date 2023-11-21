@@ -6,11 +6,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChatResponseDTO {
+public class ChatResponseDTO implements Serializable {
     private String translate;
     private String username;
     private String image;

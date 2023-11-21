@@ -4,7 +4,7 @@ import fullstack.spring.dto.FriendDTO;
 import fullstack.spring.entity.Friend;
 import fullstack.spring.entity.Profile;
 import fullstack.spring.entity.User;
-import fullstack.spring.repository.CommentRepo;
+import fullstack.spring.repository.ChatRepo;
 import fullstack.spring.repository.FriendRepo;
 import fullstack.spring.repository.ProfileRepo;
 import fullstack.spring.repository.UserRepo;
@@ -40,7 +40,7 @@ public class FriendService {
     @Autowired
     private ProfileRepo profileRepo;
     @Autowired
-    private CommentRepo commentRepo;
+    private ChatRepo chatRepo;
     public void addFriend(HttpServletRequest httpServletRequest, String targetName) throws RuntimeException, IOException, ServletException {
         try{
             String userEmail = jwtService.extractEmailFromHeader(httpServletRequest);
@@ -104,7 +104,6 @@ public class FriendService {
                         .path(path)
                         .email(friend.getEmail())
                         .targetId(friend.getTargetId())
-                                .lastComment()
                         .build()
                 );
             });
