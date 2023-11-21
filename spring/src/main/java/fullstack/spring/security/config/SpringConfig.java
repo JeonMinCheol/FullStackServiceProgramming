@@ -18,6 +18,7 @@ public class SpringConfig implements WebMvcConfigurer {
                 .addMapping("/**") // API의 모든 주소에 대해 허용
                 .allowedOrigins("*")
                 .allowedMethods("*")
+                .allowCredentials(false)
                 .allowedHeaders(HttpHeaders.AUTHORIZATION, HttpHeaders.CONTENT_TYPE, HttpHeaders.ORIGIN);
     }
 }

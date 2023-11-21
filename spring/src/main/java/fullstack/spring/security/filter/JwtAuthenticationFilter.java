@@ -46,7 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // 토큰이 잘못된 경우
         if(authorization == null || !authorization.startsWith("Bearer ")){
-            throw new RuntimeException();
+            throw new RuntimeException("Token Error");
         }
 
         jwt = jwtService.extractToken(authorization);
@@ -68,7 +68,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
 
-        log.info(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString());
         doFilter(request,response,filterChain);
     }
 }
