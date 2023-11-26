@@ -102,7 +102,7 @@ public class RoomService {
         roomRepo.findAllByTarget(user.getId()).get().forEach(room -> {
             Optional<Comment> lastComment = chatRepo.getLastChat(room.getId());
 
-            Optional<Profile> profile = profileRepo.findByUserId(room.getFriend().getTargetId());
+            Optional<Profile> profile = profileRepo.findByUserId(room.getUser().getId());
             String path = null;
 
             path = profile.isPresent() ? profile.get().getPath() : "/profileImg/default-profile.jpg";
@@ -111,21 +111,21 @@ public class RoomService {
                 rooms.add(RoomDTO
                     .builder()
                     .id(room.getId())
-                    .user1(room.getUser().getId())
-                    .user2(room.getFriend().getTargetId())
+                    .user1(user.getId())                            // user1은 나
+                    .user2(room.getUser().getId())                  // user2는 친구
                     .lastComment(lastComment.get().getText())
                     .path(path)
-                    .nickName(room.getFriend().getNickName())
+                    .nickName(room.getUser().getNickName())
                     .build());
             else
                 rooms.add(RoomDTO
                         .builder()
                         .id(room.getId())
-                        .user1(room.getUser().getId())
-                        .user2(room.getFriend().getTargetId())
+                        .user1(user.getId())
+                        .user2(room.getUser().getId())
                         .lastComment(null)
                         .path(path)
-                        .nickName(room.getFriend().getNickName())
+                        .nickName(room.getUser().getNickName())
                         .build());
         });
 

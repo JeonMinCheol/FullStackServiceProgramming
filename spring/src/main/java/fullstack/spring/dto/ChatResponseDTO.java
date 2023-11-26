@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -14,14 +16,16 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class ChatResponseDTO implements Serializable {
     private String translate;
-    private String username;
+    private String nickName;
     private String image;
     private String text;
+    private LocalDate time;
 
-    public ChatResponseDTO(Comment comment) {
-        this.translate = comment.getTranslate();
-        this.username = comment.getUser().getUsername();
-        this.image = comment.getImage();
-        this.text = comment.getText();
+    public ChatResponseDTO(Comment Chat) {
+        this.translate = Chat.getTranslate();
+        this.nickName = Chat.getUser().getUsername();
+        this.image = Chat.getImage();
+        this.text = Chat.getText();
+        this.time = LocalDate.now();
     }
 }

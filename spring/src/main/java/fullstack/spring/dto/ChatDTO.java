@@ -11,9 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChatDTO {
-    private long id;
-    private long userId;
-    private String text;
     private String translate;
-    private String imageUrl;
+    private String username;
+    private String image;
+    private String text;
 }

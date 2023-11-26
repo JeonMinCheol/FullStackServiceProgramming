@@ -1,6 +1,7 @@
 package fullstack.spring.controller;
 
 import fullstack.spring.dto.ChatDTO;
+import fullstack.spring.dto.ChatResponseDTO;
 import fullstack.spring.dto.TranslateDataDTO;
 import fullstack.spring.entity.Comment;
 import fullstack.spring.repository.ChatRepo;
@@ -40,15 +41,14 @@ public class ChatController {
     public ResponseEntity<?> getChat(HttpServletRequest httpServletRequest, @PathVariable long roomId) {
         try {
             List<Comment> comments = chatRepo.findAllByUserIdAndRoomId(jwtService.extractIdFromHeader(httpServletRequest), roomId).get();
-            List<ChatDTO> response = new ArrayList<>();
+            List<ChatResponseDTO> response = new ArrayList<>();
 
-            comments.forEach(comment -> response.add(ChatDTO
+            comments.forEach(comment -> response.add(ChatResponseDTO
                     .builder()
-                    .id(comment.getId())
-                    .userId(comment.getUser().getId())
+                    .nickName(comment.getUser().getNickName())
                     .text(comment.getText())
                     .translate(comment.getTranslate())
-                    .imageUrl(comment.getImage())
+                    .image(comment.getImage())
                     .build()));
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -60,15 +60,14 @@ public class ChatController {
     public ResponseEntity<?> getChats(HttpServletRequest httpServletRequest, @PathVariable long roomId) {
         try {
             List<Comment> comments = chatRepo.findAllByRoomId(roomId).get();
-            List<ChatDTO> response = new ArrayList<>();
+            List<ChatResponseDTO> response = new ArrayList<>();
 
-            comments.forEach(comment -> response.add(ChatDTO
+            comments.forEach(comment -> response.add(ChatResponseDTO
                     .builder()
-                    .id(comment.getId())
-                    .userId(comment.getUser().getId())
+                    .nickName(comment.getUser().getNickName())
                     .text(comment.getText())
                     .translate(comment.getTranslate())
-                    .imageUrl(comment.getImage())
+                    .image(comment.getImage())
                     .build()));
             return ResponseEntity.ok(response);
         } catch (Exception e) {
