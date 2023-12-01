@@ -2,6 +2,7 @@ package fullstack.spring.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -44,7 +45,7 @@ public class TranslateService {
     private void addHeader(HttpHeaders header) {
         header.add("X-Naver-Client-Id", clientId);
         header.add("X-Naver-Client-Secret", clientSecret);
-        header.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
+        header.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE+";charset=utf-8");
     }
 
     public String detect(String text) throws JsonProcessingException, ParseException {
@@ -84,6 +85,7 @@ public class TranslateService {
         HttpHeaders header = new HttpHeaders();
         addHeader(header);
 
+        if(source == "ko") source = "ko";
         String data = "source=" + source + "&target=" + target + "&text=" + text;
 
         log.info(data);
@@ -98,6 +100,8 @@ public class TranslateService {
         //데이터를 제대로 전달 받았는지 확인 string형태로 파싱해줌
         ObjectMapper mapper = new ObjectMapper();
         jsonInString = mapper.writeValueAsString(resultMap.getBody());
+
+        log.info(jsonInString);
 
         JSONObject object = (JSONObject) parser.parse(jsonInString);
         JSONObject ret1 = (JSONObject) object.get("message");
