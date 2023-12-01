@@ -1,6 +1,5 @@
 package fullstack.spring.config;
 
-import fullstack.spring.dto.ChatRequestDTO;
 import fullstack.spring.dto.ChatResponseDTO;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;

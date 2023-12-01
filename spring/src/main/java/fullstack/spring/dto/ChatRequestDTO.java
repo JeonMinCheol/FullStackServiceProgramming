@@ -12,8 +12,9 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChatRequestDTO implements Serializable {
-    private String username;
-    private byte[] binaryImage;
+    private String nickName;
+    private String binaryImage;
     private String text;
     private long roomId;
+    private String targetLang;
 }

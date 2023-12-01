@@ -6,6 +6,7 @@ import fullstack.spring.dto.ChatRequestDTO;
 import fullstack.spring.dto.ChatResponseDTO;
 import fullstack.spring.service.ChatService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -15,6 +16,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 
+import java.io.IOException;
+
+@Log
 @Controller
 @RequiredArgsConstructor
 public class WebSocketController {
@@ -22,12 +26,11 @@ public class WebSocketController {
     private final SimpMessageSendingOperations simpMessageSendingOperations;
 
     @MessageMapping("/chat")
-    public void sendTo(ChatRequestDTO chatRequestDTO) throws ParseException, JsonProcessingException {
+    public void sendTo(ChatRequestDTO chatRequestDTO) throws ParseException, IOException {
         long roomId = chatRequestDTO.getRoomId();
         // 데이터 저장 및 해석.
         ChatResponseDTO chatResponseDTO = chatService.chattingHandler(chatRequestDTO);
-
-        // 메세지 전송 (이미지는 바이너리로 변환)
+        // 메세지 전송
         simpMessageSendingOperations.convertAndSend("/sub/room/"+roomId, chatResponseDTO);
     }
 }

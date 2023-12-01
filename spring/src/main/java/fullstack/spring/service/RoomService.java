@@ -68,7 +68,7 @@ public class RoomService {
 
         // 내가 생성한 경우 찾기 위해서
         roomRepo.findAllByUserId(user.getId()).get().forEach(room -> {
-            Optional<Comment> lastComment = chatRepo.getLastChat(room.getId());
+            Optional<Chat> lastComment = chatRepo.getLastChat(room.getId());
 
             Optional<Profile> profile = profileRepo.findByUserId(room.getFriend().getTargetId());
             String path = null;
@@ -100,33 +100,36 @@ public class RoomService {
         // TODO : 여기 코드 바꿔야함 (현재 로직과 성립되지 않음)
         // 상대가 생성한 경우 찾기 위해서
         roomRepo.findAllByTarget(user.getId()).get().forEach(room -> {
-            Optional<Comment> lastComment = chatRepo.getLastChat(room.getId());
+            if(room.getUser().getId() != room.getTarget()) {
 
-            Optional<Profile> profile = profileRepo.findByUserId(room.getUser().getId());
-            String path = null;
+                Optional<Chat> lastComment = chatRepo.getLastChat(room.getId());
 
-            path = profile.isPresent() ? profile.get().getPath() : "/profileImg/default-profile.jpg";
+                Optional<Profile> profile = profileRepo.findByUserId(room.getUser().getId());
+                String path = null;
 
-            if(lastComment.isPresent())
-                rooms.add(RoomDTO
-                    .builder()
-                    .id(room.getId())
-                    .user1(user.getId())                            // user1은 나
-                    .user2(room.getUser().getId())                  // user2는 친구
-                    .lastComment(lastComment.get().getText())
-                    .path(path)
-                    .nickName(room.getUser().getNickName())
-                    .build());
-            else
-                rooms.add(RoomDTO
-                        .builder()
-                        .id(room.getId())
-                        .user1(user.getId())
-                        .user2(room.getUser().getId())
-                        .lastComment(null)
-                        .path(path)
-                        .nickName(room.getUser().getNickName())
-                        .build());
+                path = profile.isPresent() ? profile.get().getPath() : "/profileImg/default-profile.jpg";
+
+                if (lastComment.isPresent())
+                    rooms.add(RoomDTO
+                            .builder()
+                            .id(room.getId())
+                            .user1(user.getId())                            // user1은 나
+                            .user2(room.getUser().getId())                  // user2는 친구
+                            .lastComment(lastComment.get().getText())
+                            .path(path)
+                            .nickName(room.getUser().getNickName())
+                            .build());
+                else
+                    rooms.add(RoomDTO
+                            .builder()
+                            .id(room.getId())
+                            .user1(user.getId())
+                            .user2(room.getUser().getId())
+                            .lastComment(null)
+                            .path(path)
+                            .nickName(room.getUser().getNickName())
+                            .build());
+            }
         });
 
         return new ResponseEntity<>(rooms, HttpStatusCode.valueOf(200));

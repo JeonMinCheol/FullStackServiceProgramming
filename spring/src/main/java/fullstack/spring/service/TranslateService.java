@@ -13,8 +13,10 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.lang.model.type.ErrorType;
 import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -71,7 +73,9 @@ public class TranslateService {
         return langCode;
     }
 
-    public String translate(String text, String source) throws JsonProcessingException, ParseException {
+    public String translate(String text, String source, String target) throws JsonProcessingException, ParseException {
+        // if(Objects.equals(source, "ko") || Objects.equals(source, "vi")) return "";
+
         HashMap<String, Object> result = new HashMap<String, Object>();
         String jsonInString = "";
 
@@ -80,7 +84,8 @@ public class TranslateService {
         HttpHeaders header = new HttpHeaders();
         addHeader(header);
 
-        String data = "source=" + source + "&target=ko&text=" + text;
+        String data = "source=" + source + "&target=" + target + "&text=" + text;
+
         log.info(data);
 
         HttpEntity<?> entity = new HttpEntity<>(data, header);
@@ -98,6 +103,7 @@ public class TranslateService {
         JSONObject ret1 = (JSONObject) object.get("message");
         JSONObject ret2 = (JSONObject) ret1.get("result");
         String translatedText = (String) ret2.get("translatedText");
+        log.info(translatedText);
 
         return translatedText;
     }

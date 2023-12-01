@@ -1,6 +1,6 @@
 package fullstack.spring.dto;
 
-import fullstack.spring.entity.Comment;
+import fullstack.spring.entity.Chat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,13 +19,13 @@ public class ChatResponseDTO implements Serializable {
     private String nickName;
     private String image;
     private String text;
-    private LocalDate time;
+    private String time;
 
-    public ChatResponseDTO(Comment Chat) {
+    public ChatResponseDTO(Chat Chat) {
         this.translate = Chat.getTranslate();
-        this.nickName = Chat.getUser().getUsername();
+        this.nickName = Chat.getNickName();
         this.image = Chat.getImage();
         this.text = Chat.getText();
-        this.time = LocalDate.now();
+        this.time = Chat.getCreatedDate().toString();
     }
 }

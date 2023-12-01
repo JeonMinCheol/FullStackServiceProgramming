@@ -10,7 +10,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 		"classpath:application.yml",
 		"classpath:key.yml"
 		}, factory = fullstack.spring.config.PropertySource.class)
-public class Application {
+public class                                    Application {
 
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);

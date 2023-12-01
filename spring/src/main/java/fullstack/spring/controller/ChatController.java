@@ -3,7 +3,7 @@ package fullstack.spring.controller;
 import fullstack.spring.dto.ChatDTO;
 import fullstack.spring.dto.ChatResponseDTO;
 import fullstack.spring.dto.TranslateDataDTO;
-import fullstack.spring.entity.Comment;
+import fullstack.spring.entity.Chat;
 import fullstack.spring.repository.ChatRepo;
 import fullstack.spring.security.service.JwtService;
 import fullstack.spring.service.ChatService;
@@ -40,7 +40,7 @@ public class ChatController {
     @GetMapping("/room/{roomId}/chat")
     public ResponseEntity<?> getChat(HttpServletRequest httpServletRequest, @PathVariable long roomId) {
         try {
-            List<Comment> comments = chatRepo.findAllByUserIdAndRoomId(jwtService.extractIdFromHeader(httpServletRequest), roomId).get();
+            List<Chat> comments = chatRepo.findAllByUserIdAndRoomId(jwtService.extractIdFromHeader(httpServletRequest), roomId).get();
             List<ChatResponseDTO> response = new ArrayList<>();
 
             comments.forEach(comment -> response.add(ChatResponseDTO
@@ -59,7 +59,7 @@ public class ChatController {
     @GetMapping("/room/{roomId}/chats")
     public ResponseEntity<?> getChats(HttpServletRequest httpServletRequest, @PathVariable long roomId) {
         try {
-            List<Comment> comments = chatRepo.findAllByRoomId(roomId).get();
+            List<Chat> comments = chatRepo.findAllByRoomId(roomId).get();
             List<ChatResponseDTO> response = new ArrayList<>();
 
             comments.forEach(comment -> response.add(ChatResponseDTO
@@ -68,6 +68,7 @@ public class ChatController {
                     .text(comment.getText())
                     .translate(comment.getTranslate())
                     .image(comment.getImage())
+                    .time(comment.getCreatedDate().toString())
                     .build()));
             return ResponseEntity.ok(response);
         } catch (Exception e) {
