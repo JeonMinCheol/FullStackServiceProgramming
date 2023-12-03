@@ -2,6 +2,7 @@ package fullstack.spring.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -13,8 +14,10 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.lang.model.type.ErrorType;
 import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -42,7 +45,7 @@ public class TranslateService {
     private void addHeader(HttpHeaders header) {
         header.add("X-Naver-Client-Id", clientId);
         header.add("X-Naver-Client-Secret", clientSecret);
-        header.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
+        header.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE+";charset=utf-8");
     }
 
     public String detect(String text) throws JsonProcessingException, ParseException {
@@ -71,7 +74,9 @@ public class TranslateService {
         return langCode;
     }
 
-    public String translate(String text, String source) throws JsonProcessingException, ParseException {
+    public String translate(String text, String source, String target) throws JsonProcessingException, ParseException {
+        // if(Objects.equals(source, "ko") || Objects.equals(source, "vi")) return "";
+
         HashMap<String, Object> result = new HashMap<String, Object>();
         String jsonInString = "";
 
@@ -80,7 +85,9 @@ public class TranslateService {
         HttpHeaders header = new HttpHeaders();
         addHeader(header);
 
-        String data = "source=" + source + "&target=ko&text=" + text;
+        if(source == "ko") source = "ko";
+        String data = "source=" + source + "&target=" + target + "&text=" + text;
+
         log.info(data);
 
         HttpEntity<?> entity = new HttpEntity<>(data, header);
@@ -94,10 +101,13 @@ public class TranslateService {
         ObjectMapper mapper = new ObjectMapper();
         jsonInString = mapper.writeValueAsString(resultMap.getBody());
 
+        log.info(jsonInString);
+
         JSONObject object = (JSONObject) parser.parse(jsonInString);
         JSONObject ret1 = (JSONObject) object.get("message");
         JSONObject ret2 = (JSONObject) ret1.get("result");
         String translatedText = (String) ret2.get("translatedText");
+        log.info(translatedText);
 
         return translatedText;
     }

@@ -45,7 +45,7 @@ public class AuthenticationController {
         }
     }
 
-    @GetMapping("/logout")
+    @DeleteMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request) {
         try{
             return authenticationService.logout(request);

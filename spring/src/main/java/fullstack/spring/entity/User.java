@@ -8,7 +8,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -52,7 +51,7 @@ public class User extends BaseTime implements UserDetails {
     private List<Room> rooms;
 
     @OneToMany(mappedBy = "user")
-    private List<Comment> comments;
+    private List<Chat> chats;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

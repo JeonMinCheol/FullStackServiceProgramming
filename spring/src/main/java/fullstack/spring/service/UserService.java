@@ -67,4 +67,22 @@ public class UserService {
             return new ResponseEntity<>("user not founded.", HttpStatus.BAD_REQUEST);
         }
     }
+
+    public ResponseEntity<?> findUserByToken(HttpServletRequest httpServletRequest) throws Exception {
+        try{
+            long id = jwtService.extractIdFromHeader(httpServletRequest);
+            User user = userRepo.findById(id).get();
+
+            String path = null;
+
+            Optional<Profile> profile = profileRepo.findByUserId(id);
+
+            path = profile.isPresent() ? profile.get().getPath() : "/profileImg/default-profile.jpg";
+            UserDTO userDTO = new UserDTO(user.getId(), user.getEmail(), user.getName(), user.getNickName(), path, user.getRole());
+
+            return new ResponseEntity<>(userDTO, HttpStatus.ACCEPTED);
+        } catch (Exception e) {
+            return new ResponseEntity<>("user not founded.", HttpStatus.BAD_REQUEST);
+        }
+    }
 }

@@ -13,4 +13,7 @@ public class RoomDTO {
     private long id;
     private long user1;
     private long user2;
+    private String nickName;
+    private String lastComment;
+    private String path;
 }

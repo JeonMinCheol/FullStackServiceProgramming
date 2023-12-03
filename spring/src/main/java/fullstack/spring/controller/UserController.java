@@ -25,4 +25,13 @@ public class UserController {
             return ResponseEntity.ok(e.getMessage());
         }
     }
+
+    @GetMapping("/user")
+    public ResponseEntity<?> getUserInfoById(HttpServletRequest httpServletRequest) {
+        try {
+            return userService.findUserByToken(httpServletRequest);
+        } catch (Exception e) {
+            return ResponseEntity.ok(e.getMessage());
+        }
+    }
 }

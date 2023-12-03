@@ -49,9 +49,11 @@ public class FilterConfig {
                 .csrf(AbstractHttpConfigurer::disable) // 서버에 인증 정보를 포함하지 않는다면 csrf protection은 사용하지 않아도 된다고 한다. (난 jwt 사용)
                 .authorizeHttpRequests(
                         (authorize) ->
-                                authorize.requestMatchers("/api/**").permitAll()
+                                authorize.requestMatchers("/api/**", "/connection/**", "/sub/**", "/pub/**").permitAll()
+                                        .requestMatchers(HttpMethod.GET, "/connection/**").permitAll()
                                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                                         .requestMatchers(request -> CorsUtils.isPreFlightRequest(request)).permitAll()
+                                        .anyRequest().authenticated()
                         )
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // session을 stateless하게 만들기
                 .headers((headers)->headers.disable()) // iframe 사용 시 오류 발생(클릭 재킹 차단)을 막기 위해 사용한다는데 나는 굳이 필요없긴 할 듯

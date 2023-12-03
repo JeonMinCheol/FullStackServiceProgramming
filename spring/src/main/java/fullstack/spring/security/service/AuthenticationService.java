@@ -1,13 +1,14 @@
 package fullstack.spring.security.service;
 
-import fullstack.spring.entity.ImageType;
-import fullstack.spring.entity.Profile;
-import fullstack.spring.entity.Role;
-import fullstack.spring.entity.User;
+import fullstack.spring.entity.*;
+import fullstack.spring.repository.FriendRepo;
 import fullstack.spring.repository.ProfileRepo;
+import fullstack.spring.repository.RoomRepo;
 import fullstack.spring.repository.UserRepo;
 import fullstack.spring.security.dto.LoginDto;
+import fullstack.spring.service.FriendService;
 import fullstack.spring.service.MediaService;
+import fullstack.spring.service.RoomService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,8 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final ProfileRepo profileRepo;
     private final MediaService mediaService;
+    private final FriendRepo friendRepo;
+    private final RoomRepo roomRepo;
 
     // 1. 회원 가입
     // 이메일과 닉네임 중복 확인
@@ -66,6 +69,28 @@ public class AuthenticationService {
             profileRepo.save(profile);
             log.info("profile 생성");
         }
+
+        // 나 자신과 친구 추가
+        Friend friend = Friend
+                .builder()
+                .nickName(request.getNickName())
+                .email(request.getEmail())
+                .user(user)
+                .targetId(user.getId())
+                .build();
+
+        friendRepo.save(friend);
+
+        // 채팅 방 생성
+        Room room = Room
+                .builder()
+                .friend(friend)
+                .user(user)
+                .target(user.getId())
+                .build();
+
+        roomRepo.save(room);
+
         return new ResponseEntity<String>("Register has been successfully finished.", HttpStatus.CREATED);
     }
 

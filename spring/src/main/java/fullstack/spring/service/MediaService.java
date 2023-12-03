@@ -12,6 +12,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -22,7 +25,7 @@ import java.util.stream.Collectors;
 @Service
 public class MediaService {
     private final ProfileRepo profileRepo;
-    private final String MAIN_DIR_NAME = System.getProperty("user.dir") + "\\" + "demo" + "\\" + "src" + "\\" + "main" + "\\" + "resources";
+    private static final String MAIN_DIR_NAME = System.getProperty("user.dir") + "\\" + "demo" + "\\" + "src" + "\\" + "main" + "\\" + "resources";
     private final String SUB_DIR_NAME = "\\" + "static";
 
     enum MediaType{
@@ -61,6 +64,7 @@ public class MediaService {
             String mediaURL = "\\" + path + "\\" + generateFileName;
             String destinationPath = MAIN_DIR_NAME +  SUB_DIR_NAME + mediaURL;
             log.info(destinationPath);
+
             File destination = new File(destinationPath);
             media.transferTo(destination);
             return mediaURL;
@@ -68,7 +72,6 @@ public class MediaService {
             throw new Exception(e.getMessage());
         }
     }
-
 
     public String getPathURL(String fileUrl){
         List<String> url = Arrays.stream(fileUrl.split("/")).filter(s -> !s.isEmpty()).collect(Collectors.toList());
@@ -86,5 +89,23 @@ public class MediaService {
         imageStream.close();
 
         return ResponseEntity.ok(imageByteArray);
+    }
+
+    public static String saveByteArrayAsImage(byte[] imageBytes) throws IOException {
+        String filePath = MAIN_DIR_NAME + "\\" + "static" + '\\' + ImageType.commentImg.name();
+        String generateFileName = UUID.randomUUID().toString() + ".jpg";
+
+        File folder = new File(filePath);
+
+        if (!folder.exists()) {
+            folder.mkdirs();
+        }
+
+
+        Path path = Paths.get(filePath, generateFileName);
+        Files.write(path, imageBytes);
+
+        String mediaURL = "\\" + ImageType.commentImg.name() + "\\" + generateFileName;
+        return mediaURL;
     }
 }

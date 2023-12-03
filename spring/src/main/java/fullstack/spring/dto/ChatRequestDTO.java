@@ -5,13 +5,16 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChatRequestDTO {
-    private String username;
-    private byte[] binaryImage;
+public class ChatRequestDTO implements Serializable {
+    private String nickName;
+    private String binaryImage;
     private String text;
     private long roomId;
+    private String targetLang;
 }
