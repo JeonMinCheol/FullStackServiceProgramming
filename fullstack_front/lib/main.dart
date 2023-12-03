@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:fullstack_front/Configuration.dart';
+import 'package:fullstack_front/Configs/Configuration.dart';
 import 'package:provider/provider.dart';
-import 'LoginPage.dart';
+import 'Views/LoginPage.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

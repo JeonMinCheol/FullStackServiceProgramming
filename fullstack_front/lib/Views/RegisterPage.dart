@@ -5,9 +5,9 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:fullstack_front/Configuration.dart';
+import 'package:fullstack_front/Configs/Configuration.dart';
 import 'package:image_picker/image_picker.dart';
-import 'HexColor.dart';
+import '../HexColor.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http_parser/http_parser.dart';
 
@@ -127,64 +127,72 @@ class _RegisterState extends State<Register> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text(
-            '회원가입',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-          ),
-          elevation: 0.0,
-          leading: IconButton(
-              icon: const Icon(
-                FontAwesomeIcons.arrowRotateLeft,
-                size: 16,
-              ),
-              onPressed: () {
-                Navigator.pop(
-                  context,
-                );
-              }),
+        appBar: buildAppBar(context),
+        body: buildGestureDetector(context));
+  }
+
+  GestureDetector buildGestureDetector(BuildContext context) {
+    return GestureDetector(
+          onTap: () {
+            FocusScope.of(context).unfocus();
+          },
+          child: SingleChildScrollView(
+              child: Column(children: [
+            const Padding(padding: EdgeInsets.only(top: 10)),
+            Center(
+              child: profileImageSelector()
+            ),
+            Form(
+                child: Theme(
+                    data: ThemeData(
+                      primaryColor: Colors.grey,
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 19.0, horizontal: 30),
+                      child: Builder(builder: (context) {
+                        return Column(children: [
+                          email(),
+                          const SizedBox(
+                            height: 24.0,
+                          ), // 공백
+                          password(),
+                          const SizedBox(
+                            height: 24.0,
+                          ), // 공백
+                          realName(),
+                          const SizedBox(
+                            height: 24.0,
+                          ), // 공백
+                          profileName(),
+                          const SizedBox(
+                            height: 24.0,
+                          ), // 공백
+                          registerButton(context)
+                        ]);
+                      }),
+                    )))
+          ])));
+  }
+
+  AppBar buildAppBar(BuildContext context) {
+    return AppBar(
+        title: const Text(
+          '회원가입',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
         ),
-        body: GestureDetector(
-            onTap: () {
-              FocusScope.of(context).unfocus();
-            },
-            child: SingleChildScrollView(
-                child: Column(children: [
-              const Padding(padding: EdgeInsets.only(top: 10)),
-              Center(
-                child: profileImageSelector()
-              ),
-              Form(
-                  child: Theme(
-                      data: ThemeData(
-                        primaryColor: Colors.grey,
-                      ),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 19.0, horizontal: 30),
-                        child: Builder(builder: (context) {
-                          return Column(children: [
-                            email(),
-                            const SizedBox(
-                              height: 24.0,
-                            ), // 공백
-                            password(),
-                            const SizedBox(
-                              height: 24.0,
-                            ), // 공백
-                            realName(),
-                            const SizedBox(
-                              height: 24.0,
-                            ), // 공백
-                            profileName(),
-                            const SizedBox(
-                              height: 24.0,
-                            ), // 공백
-                            registerButton(context)
-                          ]);
-                        }),
-                      )))
-            ]))));
+        elevation: 0.0,
+        leading: IconButton(
+            icon: const Icon(
+              FontAwesomeIcons.arrowRotateLeft,
+              size: 16,
+            ),
+            onPressed: () {
+              Navigator.pop(
+                context,
+              );
+            }),
+      );
   }
 
   GestureDetector profileImageSelector() {

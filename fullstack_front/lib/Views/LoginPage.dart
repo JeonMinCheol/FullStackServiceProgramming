@@ -2,11 +2,12 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:fullstack_front/Configuration.dart';
-import 'package:fullstack_front/MainPage.dart';
-import 'package:fullstack_front/RegisterPage.dart';
+import 'package:fullstack_front/Configs/Configuration.dart';
+import 'package:fullstack_front/Views/RegisterPage.dart';
+import 'package:fullstack_front/Views/ScreenPage.dart';
 import 'package:provider/provider.dart';
-import 'HexColor.dart';
+import '../HexColor.dart';
+import '../Models/UserDTO.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -21,12 +22,26 @@ class _LogInState extends State<Login> {
   TextEditingController emailTextController = TextEditingController();
   TextEditingController passwordTextController = TextEditingController();
 
+  void _getUserInfo(String token) async {
+    Dio dio = Dio();
+    dio.options.baseUrl = dotenv.env["BASE_URL"]!;
+    dio.options.headers = {
+      "Authorization": "Bearer ${context
+          .read<Configuration>()
+          .token}"
+    };
+
+    dynamic response = await dio.get("/api/user");
+    if(response.statusCode == 202) {
+        context.read<Configuration>().user = UserDTO.fromJson(response.data);
+    }
+  }
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _getUserInfo();
+      _autoLogin();
     });
   }
 
@@ -205,6 +220,9 @@ class _LogInState extends State<Login> {
       // ignore: use_build_context_synchronously
       context.read<Configuration>().token = response.data; // provider에 토큰 값 저장
 
+      // 유저 정보 저장
+      _getUserInfo(context.read<Configuration>().token);
+
       // storage에 토큰 저장 (앱 강제종료 시 로그인 가능)
       if (await storage.read(key: 'token') == null) {
         await storage.write(
@@ -217,7 +235,7 @@ class _LogInState extends State<Login> {
       Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => const MainPage()),
+            builder: (context) => ScreenPage()),
       );
     }
     else {
@@ -225,7 +243,7 @@ class _LogInState extends State<Login> {
     }
   }
 
-  void _getUserInfo() async {
+  void _autoLogin() async {
     // read 함수로 key값에 맞는 정보를 불러오고 데이터타입은 String 타입
     // 데이터가 없을때는 null을 반환
     dynamic userInfo = await storage.read(key:'token');
@@ -234,8 +252,8 @@ class _LogInState extends State<Login> {
     if (userInfo != null) {
       // ignore: use_build_context_synchronously
       context.read<Configuration>().token = userInfo;
-      Navigator.push(context, MaterialPageRoute(builder: (context) => const MainPage()));
-    }
+      _getUserInfo(userInfo);
+      Navigator.push(context, MaterialPageRoute(builder: (context) => ScreenPage()));}
   }
 }
 

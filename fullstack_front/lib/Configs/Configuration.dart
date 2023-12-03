@@ -4,10 +4,14 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 
-import 'HexColor.dart';
+import '../HexColor.dart';
+import '../Models/UserDTO.dart';
 
 class Configuration with ChangeNotifier{
   String _token = "EMPTY_TOKEN";
+  String _targetLang = "ko";
+  String _dropDownValues = "한국어";
+  UserDTO _user = UserDTO(id: -1, nickName: "NULL", name: "NULL", email: "NULL", role: "NULL", path: "NULL");
   static const storage = FlutterSecureStorage();
 
   void showSnackBar(BuildContext context, Text text) {
@@ -28,7 +32,7 @@ class Configuration with ChangeNotifier{
     };
 
     dio.options.headers= {"Authorization" : "Bearer $token"};
-    dio.get("/api/auth/logout");
+    dio.delete("/api/auth/logout");
 
     // 로그아웃 시 토큰 제거
     storage.delete(key: 'token');
@@ -38,6 +42,27 @@ class Configuration with ChangeNotifier{
 
   set token(String value) {
     _token = value;
+    notifyListeners();
+  }
+
+  UserDTO get user => _user!;
+
+  set user(UserDTO value) {
+    _user = value;
+    notifyListeners();
+  }
+
+  String get targetLang => _targetLang!;
+
+  set targetLang(String value) {
+    _targetLang = value;
+    notifyListeners();
+  }
+
+  String get dropDownValues => _dropDownValues!;
+
+  set dropDownValues(String value) {
+    _dropDownValues = value;
     notifyListeners();
   }
 }
