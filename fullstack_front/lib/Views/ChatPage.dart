@@ -11,7 +11,6 @@ import 'package:provider/provider.dart';
 
 import 'ChatDetailsPage.dart';
 import '../Models/RoomDTO.dart';
-import 'SearchPage.dart';
 
 class ChatPage extends StatefulWidget{
   const ChatPage({super.key});
@@ -79,11 +78,6 @@ class _MainState extends State<ChatPage> with WidgetsBindingObserver, RouteAware
     } catch (e) {
       print('Error saving image: $e');
     }
-  }
-
-  Future<File> _getLocalFile(String filename) async {
-    File file = File('$dirPath/$filename');
-    return file;
   }
 
   // friendList

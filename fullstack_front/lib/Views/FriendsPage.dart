@@ -10,9 +10,7 @@ import 'package:fullstack_front/Models/FriendDTO.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
-import 'ChatDetailsPage.dart';
 import 'SearchPage.dart';
-import '../Models/UserDTO.dart';
 
 class FriendPage extends StatefulWidget{
   const FriendPage({super.key});
@@ -79,11 +77,6 @@ class _MainState extends State<FriendPage> with WidgetsBindingObserver, RouteAwa
     } catch (e) {
       print('Error saving image: $e');
     }
-  }
-
-  Future<File> _getLocalFile(String filename) async {
-    File file = File('$dirPath/$filename');
-    return file;
   }
 
   // friendList
@@ -183,12 +176,10 @@ class _MainState extends State<FriendPage> with WidgetsBindingObserver, RouteAwa
             margin: const EdgeInsets.symmetric(vertical: 2),
             child: ListTile(
               onTap: () {
-                // TODO : 방 정보 서버에서 추가
-                Navigator.push(context, MaterialPageRoute(builder: (context) => ChatDetailsPage(1, 1, friends![index].targetId, friends![index].nickName)));
               },
               leading: ClipRRect(
-                child: SizedBox(child: Image.file(File('$dirPath/${friends![index].nickName}.jpg'),fit:BoxFit.fill), height:56, width: 56,),
                 borderRadius: BorderRadius.circular(10),
+                child: SizedBox(height:56, width: 56,child: Image.file(File('$dirPath/${friends![index].nickName}.jpg'),fit:BoxFit.fill),),
               ),
               title: (friends == null) ? Text("등록된 친구가 존재하지 않습니다.") : Text(friends![index].nickName),
               subtitle: const Text("")

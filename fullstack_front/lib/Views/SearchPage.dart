@@ -52,11 +52,6 @@ class _SearchPageState extends State<SearchPage> {
     }
   }
 
-  Future<File> _getLocalFile(String filename) async {
-    File file = File('$dirPath/$filename');
-    return file;
-  }
-
   Future<void> _getImage(String path, String name) async {
     Dio dio = Dio();
     dio.options.baseUrl = dotenv.env["BASE_URL"]!;

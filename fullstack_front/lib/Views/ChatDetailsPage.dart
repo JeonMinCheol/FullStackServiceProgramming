@@ -4,10 +4,8 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fullstack_front/Models/ChatDTO.dart';
-import 'package:fullstack_front/Views/ChatPage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -16,7 +14,6 @@ import 'package:stomp_dart_client/stomp_config.dart';
 import 'package:stomp_dart_client/stomp_frame.dart';
 
 import '../Configs/Configuration.dart';
-import '../Models/UserDTO.dart';
 
 class ChatDetailsPage extends StatefulWidget {
   final int roomNumber;
